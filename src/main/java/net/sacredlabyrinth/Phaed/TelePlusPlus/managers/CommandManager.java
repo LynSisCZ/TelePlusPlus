@@ -13,6 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 public final class CommandManager implements CommandExecutor
@@ -124,7 +125,7 @@ public final class CommandManager implements CommandExecutor
                         {
                             ArrayList<Entity> entities = new ArrayList<Entity>();
 
-                            Player[] players = plugin.getServer().getOnlinePlayers();
+                            Collection<? extends Player> players = plugin.getServer().getOnlinePlayers();
 
                             for (Player teleportee : players)
                             {

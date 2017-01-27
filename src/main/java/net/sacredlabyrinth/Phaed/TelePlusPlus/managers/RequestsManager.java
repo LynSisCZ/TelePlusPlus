@@ -9,15 +9,16 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
 
 public class RequestsManager
 {
     private TelePlusPlus plugin;
-    private Vector<Request> requests = new Vector<Request>();
-    private Vector<Request> purged = new Vector<Request>();
-    private HashMap<String, Request> taken = new HashMap<String, Request>();
+    private Vector<Request> requests = new Vector<>();
+    private Vector<Request> purged = new Vector<>();
+    private HashMap<String, Request> taken = new HashMap<>();
 
     public RequestsManager(TelePlusPlus plugin)
     {
@@ -111,7 +112,7 @@ public class RequestsManager
 
     public boolean existRequestTakers()
     {
-        Player[] online = plugin.getServer().getOnlinePlayers();
+        Collection<? extends Player> online = plugin.getServer().getOnlinePlayers();
 
         for (Player player : online)
         {
@@ -125,7 +126,7 @@ public class RequestsManager
 
     public void shoutRequest(Request req)
     {
-        Player[] online = plugin.getServer().getOnlinePlayers();
+        Collection<? extends Player> online = plugin.getServer().getOnlinePlayers();
 
         for (Player player : online)
         {

@@ -1,6 +1,6 @@
-package net.sacredlabyrinth.Phaed.TelePlusPlus.managers;
+package cz.sognus.TelePlusPlus.managers;
 
-import net.sacredlabyrinth.Phaed.TelePlusPlus.TelePlusPlus;
+import cz.sognus.TelePlusPlus.TelePlusPlus;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -21,9 +21,14 @@ public class ItemManager
         return plugin.sm.isSeeThrough(itemid);
     }
 
+    public boolean isThroughBlock(Material itemmat)
+    {
+        return plugin.sm.isSeeThrough(itemmat);
+    }
+
     public boolean PutItemInHand(Player player, Material item)
     {
-        ItemStack handitem = player.getItemInHand();
+        ItemStack handitem = player.getEquipment().getItemInMainHand();
         Inventory inv = player.getInventory();
 
         if (!handitem.getType().equals(item))
@@ -55,7 +60,7 @@ public class ItemManager
                 }
             }
 
-            player.setItemInHand(new ItemStack(item, 1));
+            player.getEquipment().setItemInMainHand(new ItemStack(item, 1));
         }
         else
         {

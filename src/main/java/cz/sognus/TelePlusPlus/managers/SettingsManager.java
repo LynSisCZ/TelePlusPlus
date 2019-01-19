@@ -1,7 +1,11 @@
-package net.sacredlabyrinth.Phaed.TelePlusPlus.managers;
+package cz.sognus.TelePlusPlus.managers;
 
-import net.sacredlabyrinth.Phaed.TelePlusPlus.TelePlusPlus;
+import cz.sognus.TelePlusPlus.TelePlusPlus;
+import cz.sognus.TelePlusPlus.enums.TransparentMaterials;
+import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.Material;
 
 import java.io.File;
 import java.io.IOException;
@@ -90,11 +94,11 @@ public class SettingsManager
     public boolean fallImmunity;
     private boolean noCrossWorldTps;
     public int purgeRequestMinutes;
-    public int moverItem;
-    public int toolItem;
+    public Material moverItem;
+    public Material toolItem;
     private int pageSize;
-    private int[] throughFields = new int[]{0, 6, 8, 9, 10, 11, 31, 32, 37, 38, 39, 40, 50, 51, 55, 59, 63, 65, 66, 69, 68, 70, 72, 75, 76, 77, 83, 92, 93, 94, 104, 105, 106};
-    private List<Integer> throughFieldsSet = new LinkedList<Integer>();
+    private List<Material> throughFieldsSet = new LinkedList<Material>();
+    private Material[] throughFields = TransparentMaterials.array;
 
     private TelePlusPlus plugin;
     private File main;
@@ -133,7 +137,7 @@ public class SettingsManager
             config.options().copyDefaults(true);
         }
 
-        for (int throughField : throughFields)
+        for (Material throughField : throughFields)
         {
             throughFieldsSet.add(throughField);
         }
@@ -217,8 +221,17 @@ public class SettingsManager
 
         noCrossWorldTps = config.getBoolean("settings.no-cross-world-tps", false);
         purgeRequestMinutes = config.getInt("settings.purge-requests-minutes", 5);
-        moverItem = config.getInt("settings.mover-item", 352);
-        toolItem = config.getInt("settings.tool-item", 288);
+
+        /* Names are case SENSITIVE - CAPITAL */
+        moverItem = Material.getMaterial(config.getString("settings.mover-item", "STICK").toUpperCase());
+        toolItem = Material.getMaterial(config.getString("settings.tool-item", "BONE").toUpperCase());
+
+        /* Check items for config failure - replacing it with default items */
+        if(toolItem == null) { Bukkit.getLogger().severe("[TelePlusPlus] Configuration of settings.tool-item is not valid, using default value (BONE)"); }
+        if(moverItem == null) { Bukkit.getLogger().severe("[TelePlusPlus] Configuration of settings.mover-item is not valid, using default value (STICK)"); }
+        moverItem = moverItem != null ? moverItem : Material.STICK;
+        toolItem = toolItem != null ? toolItem : Material.BONE;
+
         pageSize = config.getInt("settings.page-size", 10);
         clientSideGlass = config.getBoolean("settings.client-side-glass", true);
         explosionEffect = config.getBoolean("settings.explosion-effect", true);
@@ -244,14 +257,32 @@ public class SettingsManager
     /**
      * @return the throughFieldsSet
      */
-    public List<Integer> getThroughFieldsSet()
+    public List<Material> getThroughFieldsSet()
     {
         return throughFieldsSet;
     }
 
-    public boolean isSeeThrough(int id)
+    public boolean isSeeThrough(Object id)
     {
-        return throughFieldsSet.contains(id);
+        Material material = null;
+
+        if(id instanceof Block)
+        {
+            material = ((Block)(id)).getType();
+        }
+
+        if(id instanceof Material)
+        {
+            material = (Material)(id);
+        }
+
+        if(material == null)
+        {
+            // Assume false or failed input
+            return false;
+        }
+
+        return throughFieldsSet.contains(material);
     }
 
     public int getPageSize()

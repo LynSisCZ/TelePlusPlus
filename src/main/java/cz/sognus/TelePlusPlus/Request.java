@@ -1,4 +1,4 @@
-package net.sacredlabyrinth.Phaed.TelePlusPlus;
+package cz.sognus.TelePlusPlus;
 
 import org.bukkit.Location;
 

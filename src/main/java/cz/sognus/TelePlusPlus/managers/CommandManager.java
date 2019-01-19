@@ -1,9 +1,9 @@
-package net.sacredlabyrinth.Phaed.TelePlusPlus.managers;
+package cz.sognus.TelePlusPlus.managers;
 
-import net.sacredlabyrinth.Phaed.TelePlusPlus.*;
+import cz.sognus.TelePlusPlus.*;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -527,11 +527,11 @@ public final class CommandManager implements CommandExecutor
                     {
                         if (args.length == 1)
                         {
-                            if (plugin.im.PutItemInHand(player, Material.getMaterial(plugin.sm.moverItem)))
+                            if (plugin.im.PutItemInHand(player, (plugin.sm.moverItem)))
                             {
                                 if (plugin.sm.sayMover)
                                 {
-                                    player.sendMessage(ChatColor.DARK_PURPLE + "You now have a " + Helper.friendlyBlockType(Material.getMaterial(plugin.sm.moverItem).toString()).toLowerCase());
+                                    player.sendMessage(ChatColor.DARK_PURPLE + "You now have a " + Helper.friendlyBlockType(plugin.sm.moverItem.toString()).toLowerCase());
                                 }
                             }
                             return true;
@@ -541,11 +541,11 @@ public final class CommandManager implements CommandExecutor
                     {
                         if (args.length == 1)
                         {
-                            if (plugin.im.PutItemInHand(player, Material.getMaterial(plugin.sm.toolItem)))
+                            if (plugin.im.PutItemInHand(player, (plugin.sm.toolItem)))
                             {
                                 if (plugin.sm.sayTool)
                                 {
-                                    player.sendMessage(ChatColor.DARK_PURPLE + "You now have a " + Helper.friendlyBlockType(Material.getMaterial(plugin.sm.toolItem).toString()).toLowerCase());
+                                    player.sendMessage(ChatColor.DARK_PURPLE + "You now have a " + Helper.friendlyBlockType(plugin.sm.toolItem.toString()).toLowerCase());
                                 }
                             }
                             return true;
@@ -1110,15 +1110,15 @@ public final class CommandManager implements CommandExecutor
                         }
                         if (plugin.pm.hasPermission(sender, plugin.pm.clear) && !plugin.sm.disableClear)
                         {
-                            cb.addRow(ChatColor.WHITE + "  /tp clear" + ChatColor.DARK_PURPLE + " - Clear your tp history and " + Helper.friendlyBlockType(Material.getMaterial(plugin.sm.moverItem).toString()).toLowerCase() + " selections");
+                            cb.addRow(ChatColor.WHITE + "  /tp clear" + ChatColor.DARK_PURPLE + " - Clear your tp history and " + Helper.friendlyBlockType(plugin.sm.moverItem.toString()).toLowerCase() + " selections");
                         }
                         if (plugin.pm.hasPermission(sender, plugin.pm.tool) && !plugin.sm.disableTool)
                         {
-                            cb.addRow(ChatColor.WHITE + "  /tp tool" + ChatColor.DARK_PURPLE + " - Get a " + Helper.friendlyBlockType(Material.getMaterial(plugin.sm.toolItem).toString()).toLowerCase() + " to tp yourself around");
+                            cb.addRow(ChatColor.WHITE + "  /tp tool" + ChatColor.DARK_PURPLE + " - Get a " + Helper.friendlyBlockType(plugin.sm.toolItem.toString()).toLowerCase() + " to tp yourself around");
                         }
                         if (plugin.pm.hasPermission(sender, plugin.pm.mover) && !plugin.sm.disableMover)
                         {
-                            cb.addRow(ChatColor.WHITE + "  /tp mover" + ChatColor.DARK_PURPLE + " - Get a " + Helper.friendlyBlockType(Material.getMaterial(plugin.sm.moverItem).toString()).toLowerCase() + " to tp others around");
+                            cb.addRow(ChatColor.WHITE + "  /tp mover" + ChatColor.DARK_PURPLE + " - Get a " + Helper.friendlyBlockType(plugin.sm.moverItem.toString()).toLowerCase() + " to tp others around");
                         }
                         if (plugin.pm.hasPermission(sender, plugin.pm.request) && !plugin.sm.disableRequest)
                         {

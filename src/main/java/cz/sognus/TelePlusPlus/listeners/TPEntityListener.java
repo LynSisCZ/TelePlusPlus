@@ -1,8 +1,7 @@
-package net.sacredlabyrinth.Phaed.TelePlusPlus.listeners;
+package cz.sognus.TelePlusPlus.listeners;
 
-import net.sacredlabyrinth.Phaed.TelePlusPlus.TelePlusPlus;
+import cz.sognus.TelePlusPlus.TelePlusPlus;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,12 +28,12 @@ public class TPEntityListener implements Listener
             {
                 Player player = (Player) event.getEntity();
 
-                if (plugin.pm.hasPermission(player, plugin.pm.tool) && !plugin.sm.disableTool && player.getItemInHand().getType().equals(Material.getMaterial(plugin.sm.toolItem)))
+                if (plugin.pm.hasPermission(player, plugin.pm.tool) && !plugin.sm.disableTool && player.getEquipment().getItemInMainHand().getType().equals(plugin.sm.toolItem))
                 {
                     event.setCancelled(true);
                 }
 
-                if (plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover && player.getItemInHand().getType().equals(Material.getMaterial(plugin.sm.moverItem)))
+                if (plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover && player.getEquipment().getItemInMainHand().getType().equals(plugin.sm.moverItem))
                 {
                     event.setCancelled(true);
                 }
@@ -53,9 +52,9 @@ public class TPEntityListener implements Listener
             {
                 Player player = (Player) sub.getDamager();
                 Entity entity = sub.getEntity();
-                ItemStack item = player.getItemInHand();
+                ItemStack item = player.getEquipment().getItemInMainHand();
 
-                if (item.getType().equals(Material.getMaterial(plugin.sm.moverItem)) && plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover)
+                if (item.getType().equals(plugin.sm.moverItem) && plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover)
                 {
                     event.setCancelled(true);
 

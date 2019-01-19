@@ -98,8 +98,8 @@ glassed:
 settings:
     purge-requests-minutes: 5
     no-cross-world-tps: false
-    tool-item: 288
-    mover-item: 352
+    tool-item: bone
+    mover-item: stick
     page-size: 10
     client-side-glass: true
     explosion-effect: true

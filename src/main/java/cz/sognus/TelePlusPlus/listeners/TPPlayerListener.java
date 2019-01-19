@@ -1,12 +1,13 @@
-package net.sacredlabyrinth.Phaed.TelePlusPlus.listeners;
+package cz.sognus.TelePlusPlus.listeners;
 
-import net.sacredlabyrinth.Phaed.TelePlusPlus.Helper;
-import net.sacredlabyrinth.Phaed.TelePlusPlus.TargetBlock;
-import net.sacredlabyrinth.Phaed.TelePlusPlus.TelePlusPlus;
+import cz.sognus.TelePlusPlus.Helper;
+import cz.sognus.TelePlusPlus.TargetBlock;
+import cz.sognus.TelePlusPlus.TelePlusPlus;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -62,7 +63,7 @@ public class TPPlayerListener implements Listener
 
             if (item != null)
             {
-                if (item.getType().equals(Material.getMaterial(plugin.sm.moverItem)) && plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover)
+                if (item.getType().equals(plugin.sm.moverItem) && plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover)
                 {
                     TargetBlock aiming = new TargetBlock(player, 1000, 0.2, plugin.sm.getThroughFieldsSet());
                     Block block = aiming.getTargetBlock();
@@ -83,7 +84,7 @@ public class TPPlayerListener implements Listener
                     }
                 }
 
-                if (item.getType().equals(Material.getMaterial(plugin.sm.toolItem)) && plugin.pm.hasPermission(player, plugin.pm.tool) && !plugin.sm.disableTool)
+                if (item.getType().equals(plugin.sm.toolItem) && plugin.pm.hasPermission(player, plugin.pm.tool) && !plugin.sm.disableTool)
                 {
                     TargetBlock aiming = new TargetBlock(player, 1000, 0.2, plugin.sm.getThroughFieldsSet());
                     Block block = aiming.getTargetBlock();
@@ -147,7 +148,7 @@ public class TPPlayerListener implements Listener
 
             if (item != null)
             {
-                if (item.getType().equals(Material.getMaterial(plugin.sm.toolItem)) && plugin.pm.hasPermission(player, plugin.pm.tool) && !plugin.sm.disableTool)
+                if (item.getType().equals(plugin.sm.toolItem) && plugin.pm.hasPermission(player, plugin.pm.tool) && !plugin.sm.disableTool)
                 {
                     TargetBlock aiming = new TargetBlock(player, 1000, 0.2, plugin.sm.getThroughFieldsSet());
                     Block block = aiming.getTargetBlock();
@@ -212,7 +213,7 @@ public class TPPlayerListener implements Listener
                     }
                 }
 
-                if (item.getType().equals(Material.getMaterial(plugin.sm.moverItem)) && plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover)
+                if (item.getType().equals(plugin.sm.moverItem) && plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover)
                 {
                     Entity entity = plugin.mm.getMovedEntity(player);
 
@@ -259,18 +260,18 @@ public class TPPlayerListener implements Listener
                     if (block != null)
                     {
                         Material mat = block.getType();
-                        byte data = block.getData();
+                        BlockData data = block.getBlockData();
 
                         TargetBlock aiming = new TargetBlock(player, 3000, 0.2, plugin.sm.getThroughFieldsSet());
                         Block target = aiming.getFaceBlock();
 
                         if (target != null)
                         {
-                            if (plugin.im.isThroughBlock(target.getTypeId()))
+                            if (plugin.im.isThroughBlock(target.getType()))
                             {
                                 block.setType(Material.AIR);
                                 target.setType(mat);
-                                target.setData(data);
+                                target.setBlockData(data);
 
                                 if (plugin.sm.sayMover)
                                 {

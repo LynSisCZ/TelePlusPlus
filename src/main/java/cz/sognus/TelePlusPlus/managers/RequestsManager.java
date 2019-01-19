@@ -1,9 +1,9 @@
-package net.sacredlabyrinth.Phaed.TelePlusPlus.managers;
+package cz.sognus.TelePlusPlus.managers;
 
-import net.sacredlabyrinth.Phaed.TelePlusPlus.ChatBlock;
-import net.sacredlabyrinth.Phaed.TelePlusPlus.Helper;
-import net.sacredlabyrinth.Phaed.TelePlusPlus.Request;
-import net.sacredlabyrinth.Phaed.TelePlusPlus.TelePlusPlus;
+import cz.sognus.TelePlusPlus.ChatBlock;
+import cz.sognus.TelePlusPlus.Helper;
+import cz.sognus.TelePlusPlus.Request;
+import cz.sognus.TelePlusPlus.TelePlusPlus;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;

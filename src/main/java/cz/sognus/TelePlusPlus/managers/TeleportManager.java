@@ -134,11 +134,6 @@ public class TeleportManager
         Block id1 = world.getBlockAt(coord1);
         Block id2 = world.getBlockAt(coord2);
 
-        Bukkit.getLogger().info("ID1: "+id1.toString());
-        Bukkit.getLogger().info("ID2: "+id2.toString());
-        Bukkit.getLogger().info("SEE TRU 1:"+plugin.sm.isSeeThrough(id1));
-        Bukkit.getLogger().info("SEE TRU 2:"+plugin.sm.isSeeThrough(id2));
-
         return (plugin.sm.isSeeThrough(id1)) && (plugin.sm.isSeeThrough(id2));
     }
 

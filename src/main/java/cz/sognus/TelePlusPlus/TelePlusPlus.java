@@ -4,12 +4,11 @@ import cz.sognus.TelePlusPlus.listeners.TPEntityListener;
 import cz.sognus.TelePlusPlus.listeners.TPPlayerListener;
 import cz.sognus.TelePlusPlus.managers.*;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.logging.Logger;
 
-public class TelePlusPlus extends JavaPlugin
-{
-    private TPPlayerListener playerListener;
-    private TPEntityListener entityListener;
+public class TelePlusPlus extends JavaPlugin {
+    public static Logger log;
     public PermissionsManager pm;
     public SettingsManager sm;
     public RequestsManager rm;
@@ -19,11 +18,10 @@ public class TelePlusPlus extends JavaPlugin
     public CommandManager cm;
     public MoverManager mm;
     public ItemManager im;
+    private TPPlayerListener playerListener;
+    private TPEntityListener entityListener;
 
-    public static Logger log;
-
-    public void onEnable()
-    {
+    public void onEnable() {
         playerListener = new TPPlayerListener(this);
         entityListener = new TPEntityListener(this);
         pm = new PermissionsManager(this);

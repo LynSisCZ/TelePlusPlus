@@ -12,390 +12,52 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author phaed
  */
-public class ChatBlock
-{
-    private final int colspacing = 12;
+public class ChatBlock {
+    /**
+     *
+     */
+    public static final Logger log = Logger.getLogger("Minecraft");
     private static final int lineLength = 320;
+    private final int colspacing = 12;
     private ArrayList<Double> columnSizes = new ArrayList<Double>();
     private ArrayList<Integer> columnSpaces = new ArrayList<Integer>();
     private ArrayList<String> columnAlignments = new ArrayList<String>();
     private LinkedList<String[]> rows = new LinkedList<String[]>();
     private boolean prefix_used = false;
     private String color = "";
-    /**
-     *
-     */
-    public static final Logger log = Logger.getLogger("Minecraft");
-
-    /**
-     *
-     * @param columnAlignment
-     */
-    public void setAlignment(String... columnAlignment)
-    {
-        columnAlignments.addAll(Arrays.asList(columnAlignment));
-    }
-
-    /**
-     *
-     * @param columnSpacings
-     */
-    public void setSpacing(int... columnSpacings)
-    {
-        for (int spacing : columnSpacings)
-        {
-            columnSpaces.add(spacing);
-        }
-    }
-
-    /**
-     *
-     * @param columnPercentages
-     * @param prefix
-     */
-    public void setColumnSizes(String prefix, double... columnPercentages)
-    {
-        int ll = lineLength;
-
-        if (prefix != null)
-        {
-            ll = lineLength - (int) msgLength(prefix);
-        }
-
-        for (double percentage : columnPercentages)
-        {
-            columnSizes.add(Math.floor((percentage / 100) * ll));
-        }
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean hasContent()
-    {
-        return rows.size() > 0;
-    }
-
-    /**
-     *
-     * @param contents
-     */
-    public void addRow(String... contents)
-    {
-        rows.add(contents);
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int size()
-    {
-        return rows.size();
-    }
-
-    /**
-     *
-     */
-    public void clear()
-    {
-        rows.clear();
-    }
-
-    /**
-     *
-     * @param sender
-     * @param amount
-     * @return
-     */
-    public boolean sendBlock(CommandSender sender, int amount)
-    {
-        if (sender == null)
-        {
-            return false;
-        }
-
-        if (rows.size() == 0)
-        {
-            return false;
-        }
-
-        if (!(sender instanceof Player))
-        {
-            amount = 999;
-        }
-
-        // if no column sizes provided them
-        // make some up based on the data
-
-        if (columnSizes.isEmpty())
-        {
-            // generate columns sizes
-
-            int col_count = rows.get(0).length;
-
-            for (int i = 0; i < col_count; i++)
-            {
-                // add custom column spacing if specified
-
-                int spacing = colspacing;
-
-                if (columnSpaces.size() >= (i + 1))
-                {
-                    spacing = columnSpaces.get(i);
-                }
-
-                columnSizes.add(getMaxWidth(i) + spacing);
-            }
-        }
-
-        // size up all sections
-
-        for (int i = 0; i < amount; i++)
-        {
-            if (rows.size() == 0)
-            {
-                continue;
-            }
-
-            String rowstring = "";
-            String row[] = rows.pollFirst();
-
-            for (int sid = 0; sid < row.length; sid++)
-            {
-                String section = row[sid];
-                double colsize = (columnSizes.size() >= (sid + 1)) ? columnSizes.get(sid) : 0;
-                String align = (columnAlignments.size() >= (sid + 1)) ? columnAlignments.get(sid) : "l";
-
-                if (align.equalsIgnoreCase("r"))
-                {
-                    if (msgLength(section) > colsize)
-                    {
-                        rowstring += cropLeftToFit(section, colsize);
-                    }
-                    else if (msgLength(section) < colsize)
-                    {
-                        rowstring += padLeftToFit(section, colsize);
-                    }
-                }
-                else if (align.equalsIgnoreCase("l"))
-                {
-                    if (msgLength(section) > colsize)
-                    {
-                        rowstring += cropRightToFit(section, colsize);
-                    }
-                    else if (msgLength(section) < colsize)
-                    {
-                        rowstring += padRightToFit(section, colsize);
-                    }
-                }
-                else if (align.equalsIgnoreCase("c"))
-                {
-                    if (msgLength(section) > colsize)
-                    {
-                        rowstring += cropRightToFit(section, colsize);
-                    }
-                    else if (msgLength(section) < colsize)
-                    {
-                        rowstring += centerInLineOf(section, colsize);
-                    }
-                }
-                else if (align.equalsIgnoreCase("w"))
-                {
-                    if (msgLength(section) > colsize)
-                    {
-                        rowstring += section;
-                    }
-                    else if (msgLength(section) < colsize)
-                    {
-                        rowstring += padRightToFit(section, colsize);
-                    }
-                }
-            }
-
-            String msg = cropRightToFit(rowstring, lineLength);
-
-            if (color.length() > 0)
-            {
-                msg = color + msg;
-            }
-
-            sender.sendMessage(msg);
-        }
-
-        return rows.size() > 0;
-    }
-
-    /**
-     *
-     * @param sender
-     * @param prefix
-     */
-    public void sendBlock(CommandSender sender, String prefix)
-    {
-        if (sender == null)
-        {
-            return;
-        }
-
-        if (rows.size() == 0)
-        {
-            return;
-        }
-
-        prefix_used = prefix == null ? true : false;
-
-        String empty_prefix = ChatBlock.makeEmpty(prefix);
-
-        // if no column sizes provided them
-        // make some up based on the data
-
-        if (columnSizes.isEmpty())
-        {
-            // generate columns sizes
-
-            int col_count = rows.get(0).length;
-
-            for (int i = 0; i < col_count; i++)
-            {
-                // add custom column spacing if specified
-
-                int spacing = colspacing;
-
-                if (columnSpaces.size() >= (i + 1))
-                {
-                    spacing = columnSpaces.get(i);
-                }
-
-                columnSizes.add(getMaxWidth(i) + spacing);
-            }
-        }
-
-        // size up all sections
-
-        for (String[] row : rows)
-        {
-            String rowstring = "";
-
-            for (int sid = 0; sid < row.length; sid++)
-            {
-                String section = row[sid];
-                double colsize = (columnSizes.size() >= (sid + 1)) ? columnSizes.get(sid) : 0;
-                String align = (columnAlignments.size() >= (sid + 1)) ? columnAlignments.get(sid) : "l";
-
-                if (align.equalsIgnoreCase("r"))
-                {
-                    if (msgLength(section) > colsize)
-                    {
-                        rowstring += cropLeftToFit(section, colsize);
-                    }
-                    else if (msgLength(section) < colsize)
-                    {
-                        rowstring += padLeftToFit(section, colsize);
-                    }
-                }
-                else if (align.equalsIgnoreCase("l"))
-                {
-                    if (msgLength(section) > colsize)
-                    {
-                        rowstring += cropRightToFit(section, colsize);
-                    }
-                    else if (msgLength(section) < colsize)
-                    {
-                        rowstring += padRightToFit(section, colsize);
-                    }
-                }
-                else if (align.equalsIgnoreCase("c"))
-                {
-                    if (msgLength(section) > colsize)
-                    {
-                        rowstring += cropRightToFit(section, colsize);
-                    }
-                    else if (msgLength(section) < colsize)
-                    {
-                        rowstring += centerInLineOf(section, colsize);
-                    }
-                }
-            }
-
-            String msg = cropRightToFit((prefix_used ? empty_prefix : prefix) + " " + rowstring, lineLength);
-
-            if (color.length() > 0)
-            {
-                msg = color + msg;
-            }
-
-            sender.sendMessage(msg);
-
-            prefix_used = true;
-        }
-    }
-
-    /**
-     *
-     * @param sender
-     */
-    public void sendBlock(CommandSender sender)
-    {
-        sendBlock(sender, null);
-    }
 
     /**
      * Outputs a message to everybody
+     *
      * @param sender
      * @param msg
      */
-    public static void sendMessageAll(CommandSender sender, String msg)
-    {
+    public static void sendMessageAll(CommandSender sender, String msg) {
         sendMessageAll(sender, msg);
     }
 
     /**
-     *
-     * @param col
-     * @return
-     */
-    public double getMaxWidth(double col)
-    {
-        double maxWidth = 0;
-
-        for (String[] row : rows)
-        {
-            maxWidth = Math.max(maxWidth, msgLength(row[(int) col]));
-        }
-
-        return maxWidth;
-    }
-
-    /**
-     *
      * @param msg
      * @return
      */
-    public static String centerInLine(String msg)
-    {
+    public static String centerInLine(String msg) {
         return centerInLineOf(msg, lineLength);
     }
 
     /**
-     *
      * @param msg
      * @param lineLength
      * @return
      */
-    public static String centerInLineOf(String msg, double lineLength)
-    {
+    public static String centerInLineOf(String msg, double lineLength) {
         double length = msgLength(msg);
         double diff = lineLength - length;
 
         // if too big for line return it as is
 
-        if (diff < 0)
-        {
+        if (diff < 0) {
             return msg;
         }
 
@@ -413,14 +75,11 @@ public class ChatBlock
     }
 
     /**
-     *
      * @param str
      * @return
      */
-    public static String makeEmpty(String str)
-    {
-        if (str == null)
-        {
+    public static String makeEmpty(String str) {
+        if (str == null) {
             return "";
         }
 
@@ -428,20 +87,16 @@ public class ChatBlock
     }
 
     /**
-     *
      * @param msg
      * @param length
      * @return
      */
-    public static String cropRightToFit(String msg, double length)
-    {
-        if (msg == null || msg.length() == 0 || length == 0)
-        {
+    public static String cropRightToFit(String msg, double length) {
+        if (msg == null || msg.length() == 0 || length == 0) {
             return "";
         }
 
-        while (msgLength(msg) >= length)
-        {
+        while (msgLength(msg) >= length) {
             msg = msg.substring(0, msg.length() - 2);
         }
 
@@ -449,20 +104,16 @@ public class ChatBlock
     }
 
     /**
-     *
      * @param msg
      * @param length
      * @return
      */
-    public static String cropLeftToFit(String msg, double length)
-    {
-        if (msg == null || msg.length() == 0 || length == 0)
-        {
+    public static String cropLeftToFit(String msg, double length) {
+        if (msg == null || msg.length() == 0 || length == 0) {
             return "";
         }
 
-        while (msgLength(msg) >= length)
-        {
+        while (msgLength(msg) >= length) {
             msg = msg.substring(1);
         }
 
@@ -471,19 +122,17 @@ public class ChatBlock
 
     /**
      * Padds left til the string is a certain size
+     *
      * @param msg
      * @param length
      * @return
      */
-    public static String padLeftToFit(String msg, double length)
-    {
-        if (msgLength(msg) > length)
-        {
+    public static String padLeftToFit(String msg, double length) {
+        if (msgLength(msg) > length) {
             return msg;
         }
 
-        while (msgLength(msg) < length)
-        {
+        while (msgLength(msg) < length) {
             msg = " " + msg;
         }
 
@@ -492,19 +141,17 @@ public class ChatBlock
 
     /**
      * Pads right til the string is a certain size
+     *
      * @param msg
      * @param length
      * @return
      */
-    public static String padRightToFit(String msg, double length)
-    {
-        if (msgLength(msg) > length)
-        {
+    public static String padRightToFit(String msg, double length) {
+        if (msgLength(msg) > length) {
             return msg;
         }
 
-        while (msgLength(msg) < length)
-        {
+        while (msgLength(msg) < length) {
             msg += " ";
         }
 
@@ -513,25 +160,21 @@ public class ChatBlock
 
     /**
      * Finds the length on the screen of a string. Ignores colors.
+     *
      * @param str
      * @return
      */
-    public static double msgLength(String str)
-    {
+    public static double msgLength(String str) {
         double length = 0;
         str = cleanColors(str);
 
         // Loop through all the characters, skipping any color characters and their following color codes
 
-        for (int x = 0; x < str.length(); x++)
-        {
+        for (int x = 0; x < str.length(); x++) {
             int len = charLength(str.charAt(x));
-            if (len > 0)
-            {
+            if (len > 0) {
                 length += len;
-            }
-            else
-            {
+            } else {
                 x++;
             }
         }
@@ -539,12 +182,10 @@ public class ChatBlock
     }
 
     /**
-     *
      * @param str
      * @return
      */
-    public static String cleanColors(String str)
-    {
+    public static String cleanColors(String str) {
         String patternStr = "ï¿½.";
         String replacementStr = "";
 
@@ -557,63 +198,46 @@ public class ChatBlock
 
     /**
      * Finds the visual length of the character on the screen.
+     *
      * @param x
      * @return
      */
-    public static int charLength(char x)
-    {
-        if ("i.:,;|!".indexOf(x) != -1)
-        {
+    public static int charLength(char x) {
+        if ("i.:,;|!".indexOf(x) != -1) {
             return 2;
-        }
-        else if ("l'".indexOf(x) != -1)
-        {
+        } else if ("l'".indexOf(x) != -1) {
             return 3;
-        }
-        else if ("tI[]".indexOf(x) != -1)
-        {
+        } else if ("tI[]".indexOf(x) != -1) {
             return 4;
-        }
-        else if ("fk{}<>\"*()".indexOf(x) != -1)
-        {
+        } else if ("fk{}<>\"*()".indexOf(x) != -1) {
             return 5;
-        }
-        else if ("abcdeghjmnopqrsuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ1234567890\\/#?$%-=_+&^".indexOf(x) != -1)
-        {
+        } else if ("abcdeghjmnopqrsuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ1234567890\\/#?$%-=_+&^".indexOf(x) != -1) {
             return 6;
-        }
-        else if ("@~".indexOf(x) != -1)
-        {
+        } else if ("@~".indexOf(x) != -1) {
             return 7;
-        }
-        else if (x == ' ')
-        {
+        } else if (x == ' ') {
             return 4;
-        }
-        else
-        {
+        } else {
             return -1;
         }
     }
 
     /**
-     *
      * @param msg
      * @return
      */
-    public static String[] wordWrap(String msg)
-    {
+    public static String[] wordWrap(String msg) {
         return wordWrap(msg, 0);
     }
 
     /**
      * Cuts the message apart into whole words short enough to fit on one line
+     *
      * @param msg
      * @param prefixLn
      * @return
      */
-    public static String[] wordWrap(String msg, int prefixLn)
-    {
+    public static String[] wordWrap(String msg, int prefixLn) {
         // Split each word apart
 
         ArrayList<String> split = new ArrayList<String>();
@@ -625,8 +249,7 @@ public class ChatBlock
 
         // While i is less than the length of the array of words
 
-        while (!split.isEmpty())
-        {
+        while (!split.isEmpty()) {
             int len = 0;
 
             // Create an array list to hold individual words
@@ -636,14 +259,12 @@ public class ChatBlock
             // Loop through the words finding their length and increasing
             // j, the end point for the sub string
 
-            while (!split.isEmpty() && split.get(0) != null && len <= (lineLength - prefixLn))
-            {
+            while (!split.isEmpty() && split.get(0) != null && len <= (lineLength - prefixLn)) {
                 double wordLength = msgLength(split.get(0)) + 4;
 
                 // If a word is too long for a line
 
-                if (wordLength > (lineLength - prefixLn))
-                {
+                if (wordLength > (lineLength - prefixLn)) {
                     String[] tempArray = wordCut(len, split.remove(0));
                     words.add(tempArray[0]);
                     split.add(tempArray[1]);
@@ -652,8 +273,7 @@ public class ChatBlock
                 // If the word is not too long to fit
 
                 len += wordLength;
-                if (len < (lineLength - prefixLn) + 4)
-                {
+                if (len < (lineLength - prefixLn) + 4) {
                     words.add(split.remove(0));
                 }
             }
@@ -667,17 +287,14 @@ public class ChatBlock
     }
 
     /**
-     *
      * @param startIndex
      * @param string
      * @param seperator
      * @return
      */
-    public static String combineSplit(int startIndex, String[] string, String seperator)
-    {
+    public static String combineSplit(int startIndex, String[] string, String seperator) {
         StringBuilder builder = new StringBuilder();
-        for (int i = startIndex; i < string.length; i++)
-        {
+        for (int i = startIndex; i < string.length; i++) {
             builder.append(string[i]);
             builder.append(seperator);
         }
@@ -688,33 +305,28 @@ public class ChatBlock
 
     /**
      * Cuts apart a word that is too long to fit on one line
+     *
      * @param lengthBefore
      * @param str
      * @return
      */
-    public static String[] wordCut(int lengthBefore, String str)
-    {
+    public static String[] wordCut(int lengthBefore, String str) {
         int length = lengthBefore;
 
         // Loop through all the characters, skipping any color characters and their following color codes
 
         String[] output = new String[2];
         int x = 0;
-        while (length < lineLength && x < str.length())
-        {
+        while (length < lineLength && x < str.length()) {
             int len = charLength(str.charAt(x));
-            if (len > 0)
-            {
+            if (len > 0) {
                 length += len;
-            }
-            else
-            {
+            } else {
                 x++;
             }
             x++;
         }
-        if (x > str.length())
-        {
+        if (x > str.length()) {
             x = str.length();
         }
 
@@ -730,39 +342,37 @@ public class ChatBlock
 
     /**
      * Outputs a single line out, crops overflow
+     *
      * @param receiver
      * @param msg
      */
-    public static void saySingle(CommandSender receiver, String msg)
-    {
-        if (receiver == null)
-        {
+    public static void saySingle(CommandSender receiver, String msg) {
+        if (receiver == null) {
             return;
         }
 
-        receiver.sendMessage(cropRightToFit(colorize(new String[] { msg })[0], lineLength));
+        receiver.sendMessage(cropRightToFit(colorize(new String[]{msg})[0], lineLength));
     }
 
     /**
      * Outputs a message to a user
+     *
      * @param receiver
      * @param msg
      */
-    public static void sendMessage(CommandSender receiver, String msg)
-    {
+    public static void sendMessage(CommandSender receiver, String msg) {
         sendPrefixedMessage(receiver, null, msg);
     }
 
     /**
      * Outputs a message to a user
+     *
      * @param receiver
      * @param prefix
      * @param msg
      */
-    public static void sendPrefixedMessage(CommandSender receiver, String prefix, String msg)
-    {
-        if (receiver == null)
-        {
+    public static void sendPrefixedMessage(CommandSender receiver, String prefix, String msg) {
+        if (receiver == null) {
             return;
         }
 
@@ -770,29 +380,18 @@ public class ChatBlock
 
         String[] message = colorize(wordWrap(msg, prefix_width));
 
-        for (String out : message)
-        {
+        for (String out : message) {
             receiver.sendMessage((prefix == null ? "" : prefix + " ") + out);
         }
     }
 
     /**
      * Send blank lie
-     * @param color
-     */
-    public void startColor(String color)
-    {
-        this.color = color;
-    }
-
-    /**
-     * Send blank lie
+     *
      * @param receiver
      */
-    public static void sendBlank(CommandSender receiver)
-    {
-        if (receiver == null)
-        {
+    public static void sendBlank(CommandSender receiver) {
+        if (receiver == null) {
             return;
         }
 
@@ -801,62 +400,52 @@ public class ChatBlock
 
     /**
      * Colors each line
+     *
      * @param message
      * @return
      */
-    public static String[] say(String message)
-    {
+    public static String[] say(String message) {
         return colorize(wordWrap(message));
     }
 
     /**
-     *
      * @param message
      * @return
      */
-    public static String[] colorize(String[] message)
-    {
+    public static String[] colorize(String[] message) {
         return colorizeBase(message, 167);
     }
 
     /**
-     *
      * @param message
      * @return
      */
-    public static String colorize(String message)
-    {
+    public static String colorize(String message) {
         return colorizeBase((new String[]
                 {
-                    message
+                        message
                 }), 167)[0];
     }
 
     /**
-     *
      * @param message
      * @param charcode
      * @return
      */
-    public static String[] colorizeBase(String[] message, int charcode)
-    {
-        if (message != null && message[0] != null && !message[0].isEmpty())
-        {
+    public static String[] colorizeBase(String[] message, int charcode) {
+        if (message != null && message[0] != null && !message[0].isEmpty()) {
             // Go through each line
 
             String prevColor = "";
             String lastColor = "";
 
             int counter = 0;
-            for (String msg : message)
-            {
+            for (String msg : message) {
                 // Loop through looking for a color code
 
-                for (int x = 0; x < msg.length(); x++)
-                {
+                for (int x = 0; x < msg.length(); x++) {
                     // If the char is color code
-                    if (msg.codePointAt(x) == charcode)
-                    {
+                    if (msg.codePointAt(x) == charcode) {
                         // advance x to the next character
                         x += 1;
 
@@ -875,18 +464,277 @@ public class ChatBlock
     }
 
     /**
+     * @param columnAlignment
+     */
+    public void setAlignment(String... columnAlignment) {
+        columnAlignments.addAll(Arrays.asList(columnAlignment));
+    }
+
+    /**
+     * @param columnSpacings
+     */
+    public void setSpacing(int... columnSpacings) {
+        for (int spacing : columnSpacings) {
+            columnSpaces.add(spacing);
+        }
+    }
+
+    /**
+     * @param columnPercentages
+     * @param prefix
+     */
+    public void setColumnSizes(String prefix, double... columnPercentages) {
+        int ll = lineLength;
+
+        if (prefix != null) {
+            ll = lineLength - (int) msgLength(prefix);
+        }
+
+        for (double percentage : columnPercentages) {
+            columnSizes.add(Math.floor((percentage / 100) * ll));
+        }
+    }
+
+    /**
+     * @return
+     */
+    public boolean hasContent() {
+        return rows.size() > 0;
+    }
+
+    /**
+     * @param contents
+     */
+    public void addRow(String... contents) {
+        rows.add(contents);
+    }
+
+    /**
+     * @return
+     */
+    public int size() {
+        return rows.size();
+    }
+
+    /**
      *
+     */
+    public void clear() {
+        rows.clear();
+    }
+
+    /**
+     * @param sender
+     * @param amount
+     * @return
+     */
+    public boolean sendBlock(CommandSender sender, int amount) {
+        if (sender == null) {
+            return false;
+        }
+
+        if (rows.size() == 0) {
+            return false;
+        }
+
+        if (!(sender instanceof Player)) {
+            amount = 999;
+        }
+
+        // if no column sizes provided them
+        // make some up based on the data
+
+        if (columnSizes.isEmpty()) {
+            // generate columns sizes
+
+            int col_count = rows.get(0).length;
+
+            for (int i = 0; i < col_count; i++) {
+                // add custom column spacing if specified
+
+                int spacing = colspacing;
+
+                if (columnSpaces.size() >= (i + 1)) {
+                    spacing = columnSpaces.get(i);
+                }
+
+                columnSizes.add(getMaxWidth(i) + spacing);
+            }
+        }
+
+        // size up all sections
+
+        for (int i = 0; i < amount; i++) {
+            if (rows.size() == 0) {
+                continue;
+            }
+
+            String rowstring = "";
+            String[] row = rows.pollFirst();
+
+            for (int sid = 0; sid < row.length; sid++) {
+                String section = row[sid];
+                double colsize = (columnSizes.size() >= (sid + 1)) ? columnSizes.get(sid) : 0;
+                String align = (columnAlignments.size() >= (sid + 1)) ? columnAlignments.get(sid) : "l";
+
+                if (align.equalsIgnoreCase("r")) {
+                    if (msgLength(section) > colsize) {
+                        rowstring += cropLeftToFit(section, colsize);
+                    } else if (msgLength(section) < colsize) {
+                        rowstring += padLeftToFit(section, colsize);
+                    }
+                } else if (align.equalsIgnoreCase("l")) {
+                    if (msgLength(section) > colsize) {
+                        rowstring += cropRightToFit(section, colsize);
+                    } else if (msgLength(section) < colsize) {
+                        rowstring += padRightToFit(section, colsize);
+                    }
+                } else if (align.equalsIgnoreCase("c")) {
+                    if (msgLength(section) > colsize) {
+                        rowstring += cropRightToFit(section, colsize);
+                    } else if (msgLength(section) < colsize) {
+                        rowstring += centerInLineOf(section, colsize);
+                    }
+                } else if (align.equalsIgnoreCase("w")) {
+                    if (msgLength(section) > colsize) {
+                        rowstring += section;
+                    } else if (msgLength(section) < colsize) {
+                        rowstring += padRightToFit(section, colsize);
+                    }
+                }
+            }
+
+            String msg = cropRightToFit(rowstring, lineLength);
+
+            if (color.length() > 0) {
+                msg = color + msg;
+            }
+
+            sender.sendMessage(msg);
+        }
+
+        return rows.size() > 0;
+    }
+
+    /**
+     * @param sender
+     * @param prefix
+     */
+    public void sendBlock(CommandSender sender, String prefix) {
+        if (sender == null) {
+            return;
+        }
+
+        if (rows.size() == 0) {
+            return;
+        }
+
+        prefix_used = prefix == null;
+
+        String empty_prefix = ChatBlock.makeEmpty(prefix);
+
+        // if no column sizes provided them
+        // make some up based on the data
+
+        if (columnSizes.isEmpty()) {
+            // generate columns sizes
+
+            int col_count = rows.get(0).length;
+
+            for (int i = 0; i < col_count; i++) {
+                // add custom column spacing if specified
+
+                int spacing = colspacing;
+
+                if (columnSpaces.size() >= (i + 1)) {
+                    spacing = columnSpaces.get(i);
+                }
+
+                columnSizes.add(getMaxWidth(i) + spacing);
+            }
+        }
+
+        // size up all sections
+
+        for (String[] row : rows) {
+            String rowstring = "";
+
+            for (int sid = 0; sid < row.length; sid++) {
+                String section = row[sid];
+                double colsize = (columnSizes.size() >= (sid + 1)) ? columnSizes.get(sid) : 0;
+                String align = (columnAlignments.size() >= (sid + 1)) ? columnAlignments.get(sid) : "l";
+
+                if (align.equalsIgnoreCase("r")) {
+                    if (msgLength(section) > colsize) {
+                        rowstring += cropLeftToFit(section, colsize);
+                    } else if (msgLength(section) < colsize) {
+                        rowstring += padLeftToFit(section, colsize);
+                    }
+                } else if (align.equalsIgnoreCase("l")) {
+                    if (msgLength(section) > colsize) {
+                        rowstring += cropRightToFit(section, colsize);
+                    } else if (msgLength(section) < colsize) {
+                        rowstring += padRightToFit(section, colsize);
+                    }
+                } else if (align.equalsIgnoreCase("c")) {
+                    if (msgLength(section) > colsize) {
+                        rowstring += cropRightToFit(section, colsize);
+                    } else if (msgLength(section) < colsize) {
+                        rowstring += centerInLineOf(section, colsize);
+                    }
+                }
+            }
+
+            String msg = cropRightToFit((prefix_used ? empty_prefix : prefix) + " " + rowstring, lineLength);
+
+            if (color.length() > 0) {
+                msg = color + msg;
+            }
+
+            sender.sendMessage(msg);
+
+            prefix_used = true;
+        }
+    }
+
+    /**
+     * @param sender
+     */
+    public void sendBlock(CommandSender sender) {
+        sendBlock(sender, null);
+    }
+
+    /**
+     * @param col
+     * @return
+     */
+    public double getMaxWidth(double col) {
+        double maxWidth = 0;
+
+        for (String[] row : rows) {
+            maxWidth = Math.max(maxWidth, msgLength(row[(int) col]));
+        }
+
+        return maxWidth;
+    }
+
+    /**
+     * Send blank lie
+     *
+     * @param color
+     */
+    public void startColor(String color) {
+        this.color = color;
+    }
+
+    /**
      * @param prefix
      * @return
      */
-    public String firstPrefix(String prefix)
-    {
-        if (prefix_used)
-        {
+    public String firstPrefix(String prefix) {
+        if (prefix_used) {
             return ChatBlock.makeEmpty(prefix);
-        }
-        else
-        {
+        } else {
             prefix_used = true;
             return prefix;
         }

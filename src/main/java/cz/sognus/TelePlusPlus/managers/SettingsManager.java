@@ -9,6 +9,7 @@ import org.bukkit.Material;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -99,10 +100,12 @@ public class SettingsManager
     private int pageSize;
     private List<Material> throughFieldsSet = new LinkedList<Material>();
     private Material[] throughFields = TransparentMaterials.array;
+    private HashMap<String, Material> throughMap = TransparentMaterials.map;
 
     private TelePlusPlus plugin;
     private File main;
     private FileConfiguration config;
+
 
     public SettingsManager(TelePlusPlus plugin)
     {
@@ -255,12 +258,23 @@ public class SettingsManager
     }
 
     /**
+     *  @deprecated  since 3.0.1
+     *  Use {@link #getThroughMap()}  }
+     *
      * @return the throughFieldsSet
      */
+    @Deprecated
     public List<Material> getThroughFieldsSet()
     {
         return throughFieldsSet;
     }
+
+    /** @since 3.0.1
+     *
+     * @return through map
+     *
+     */
+    public HashMap<String, Material> getThroughMap(){ return throughMap;}
 
     public boolean isSeeThrough(Object id)
     {
@@ -282,7 +296,13 @@ public class SettingsManager
             return false;
         }
 
-        return throughFieldsSet.contains(material);
+        if(throughMap == null) {
+            return throughFieldsSet.contains(material);
+        }
+        else
+        {
+            return throughMap.containsKey(material.name());
+        }
     }
 
     public int getPageSize()

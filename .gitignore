@@ -54,6 +54,7 @@ Temporary Items
 *.project
 *.prefs
 /target/
+/out/
 /bin/
 *.iml
 /.idea/

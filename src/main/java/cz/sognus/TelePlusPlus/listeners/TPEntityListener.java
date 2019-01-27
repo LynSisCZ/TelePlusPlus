@@ -10,76 +10,55 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
-public class TPEntityListener implements Listener
-{
+public class TPEntityListener implements Listener {
     private final TelePlusPlus plugin;
 
-    public TPEntityListener(TelePlusPlus plugin)
-    {
+    public TPEntityListener(TelePlusPlus plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler
-    public void onEntityDamage(EntityDamageEvent event)
-    {
-        if (event.getCause().equals(DamageCause.FALL))
-        {
-            if (event.getEntity() instanceof Player)
-            {
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (event.getCause().equals(DamageCause.FALL)) {
+            if (event.getEntity() instanceof Player) {
                 Player player = (Player) event.getEntity();
 
-                if (plugin.pm.hasPermission(player, plugin.pm.tool) && !plugin.sm.disableTool && player.getEquipment().getItemInMainHand().getType().equals(plugin.sm.toolItem))
-                {
+                if (plugin.pm.hasPermission(player, plugin.pm.tool) && !plugin.sm.disableTool && player.getEquipment().getItemInMainHand().getType().equals(plugin.sm.toolItem)) {
                     event.setCancelled(true);
                 }
 
-                if (plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover && player.getEquipment().getItemInMainHand().getType().equals(plugin.sm.moverItem))
-                {
+                if (plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover && player.getEquipment().getItemInMainHand().getType().equals(plugin.sm.moverItem)) {
                     event.setCancelled(true);
                 }
 
-                if (plugin.gm.isFallDamageImmune(player))
-                {
+                if (plugin.gm.isFallDamageImmune(player)) {
                     event.setCancelled(true);
                 }
             }
         }
 
-        if (event instanceof EntityDamageByEntityEvent)
-        {
+        if (event instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent sub = (EntityDamageByEntityEvent) event;
-            if (sub.getDamager() instanceof Player)
-            {
+            if (sub.getDamager() instanceof Player) {
                 Player player = (Player) sub.getDamager();
                 Entity entity = sub.getEntity();
                 ItemStack item = player.getEquipment().getItemInMainHand();
 
-                if (item.getType().equals(plugin.sm.moverItem) && plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover)
-                {
+                if (item.getType().equals(plugin.sm.moverItem) && plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover) {
                     event.setCancelled(true);
 
                     plugin.mm.addMovedEntity(player, entity);
 
-                    if (plugin.sm.sayMover)
-                    {
-                        if (entity instanceof Player)
-                        {
+                    if (plugin.sm.sayMover) {
+                        if (entity instanceof Player) {
                             player.sendMessage(ChatColor.DARK_PURPLE + "Player tagged");
-                        }
-                        else if (entity instanceof Monster)
-                        {
+                        } else if (entity instanceof Monster) {
                             player.sendMessage(ChatColor.DARK_PURPLE + "Mob tagged");
-                        }
-                        else if (entity instanceof Animals)
-                        {
+                        } else if (entity instanceof Animals) {
                             player.sendMessage(ChatColor.DARK_PURPLE + "Animal tagged");
-                        }
-                        else if (entity instanceof Vehicle)
-                        {
+                        } else if (entity instanceof Vehicle) {
                             player.sendMessage(ChatColor.DARK_PURPLE + "Vehicle tagged");
-                        }
-                        else if (entity instanceof Vehicle)
-                        {
+                        } else if (entity instanceof Vehicle) {
                             player.sendMessage(ChatColor.DARK_PURPLE + "Entity tagged");
                         }
                     }

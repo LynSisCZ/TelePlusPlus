@@ -5,9 +5,12 @@ import cz.sognus.TelePlusPlus.listeners.TPPlayerListener;
 import cz.sognus.TelePlusPlus.managers.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 public class TelePlusPlus extends JavaPlugin {
+    public static TelePlusPlus plugin = null;
     public static Logger log;
     public PermissionsManager pm;
     public SettingsManager sm;
@@ -40,5 +43,7 @@ public class TelePlusPlus extends JavaPlugin {
         log = Logger.getLogger("Minecraft");
 
         getCommand("tp").setExecutor(cm);
+
+        plugin = this;
     }
 }

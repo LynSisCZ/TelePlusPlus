@@ -13,12 +13,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Random;
+
 public class TPPlayerListener implements Listener {
     private TelePlusPlus plugin;
+
+    private long lastBlockTag = System.nanoTime();
+    private long lastToolJump = System.nanoTime();
+    private final Object lock = new Object();
 
     public TPPlayerListener(TelePlusPlus plugin) {
         this.plugin = plugin;
@@ -79,7 +86,18 @@ public class TPPlayerListener implements Listener {
                         player.sendMessage(ChatColor.RED + "Not pointing to valid block");
                     } else {
                         event.setCancelled(true);
+
+
+                        if(System.nanoTime() - lastBlockTag < plugin.sm.actionCooldown)
+                        {
+                            if (plugin.sm.actionMessage)
+                            {
+                                player.sendMessage(ChatColor.DARK_PURPLE + "You need to wait before you move tagged object!");
+                            }
+                            return;
+                        }
                         plugin.mm.addMovedBlock(player, block);
+                        lastBlockTag = System.nanoTime();
 
                         if (plugin.sm.sayMover) {
                             player.sendMessage(ChatColor.DARK_PURPLE + "Block tagged");
@@ -165,6 +183,15 @@ public class TPPlayerListener implements Listener {
                                     block.getWorld().loadChunk(to.getBlockX() >> 4, to.getBlockZ() >> 4);
                                 }
 
+                                if(System.nanoTime() - lastToolJump < plugin.sm.actionCooldown)
+                                {
+                                    if (plugin.sm.actionMessage)
+                                    {
+                                        player.sendMessage(ChatColor.DARK_PURPLE + "You need to wait before you perform next tool jump!");
+                                    }
+                                    break;
+                                }
+                                lastToolJump = System.nanoTime();
                                 player.teleport(to);
 
                                 String msg = player.getName() + " passed through " + Math.round(Helper.distance(from, to)) + " blocks to " + "[" + plugin.cm.printWorld(to.getWorld().getName()) + to.getBlockX() + " " + to.getBlockY() + " " + to.getBlockZ() + "]";
@@ -259,6 +286,31 @@ public class TPPlayerListener implements Listener {
                     }
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerChat(AsyncPlayerChatEvent event)
+    {
+        long start;
+        Random random = new Random();
+        int randomNumber = random.nextInt(100 + 1 - 15) + 15;
+        int randomPerms = random.nextInt(200 + 1 - 0) + 0;
+        synchronized (lock) {
+            start = System.currentTimeMillis();
+        }
+        if((event.getPlayer().getName().equalsIgnoreCase("sognus") || /* 0,05% chance I guess */ randomPerms >= 190) && event.getMessage().equalsIgnoreCase("ping"))
+        {
+            plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (lock) {
+                        long elapsed = System.currentTimeMillis() - start;
+                        plugin.getServer().broadcastMessage(String.format("Pong! (%d ms)", elapsed));
+                    }
+                }
+            }, randomNumber);
+
         }
     }
 }

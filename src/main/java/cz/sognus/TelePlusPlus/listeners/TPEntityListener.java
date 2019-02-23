@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class TPEntityListener implements Listener {
     private final TelePlusPlus plugin;
+    private long lastMoverAction = System.nanoTime();
 
     public TPEntityListener(TelePlusPlus plugin) {
         this.plugin = plugin;
@@ -47,7 +48,16 @@ public class TPEntityListener implements Listener {
                 if (item.getType().equals(plugin.sm.moverItem) && plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover) {
                     event.setCancelled(true);
 
+                    // Action cooldown
+                    if(!timeElapsed()) {
+                        if (plugin.sm.actionMessage)
+                        {
+                            player.sendMessage(ChatColor.DARK_PURPLE + "You need to wait before you tag another object!");
+                        }
+                        return;
+                    }
                     plugin.mm.addMovedEntity(player, entity);
+                    updateTime();
 
                     if (plugin.sm.sayMover) {
                         if (entity instanceof Player) {
@@ -58,12 +68,23 @@ public class TPEntityListener implements Listener {
                             player.sendMessage(ChatColor.DARK_PURPLE + "Animal tagged");
                         } else if (entity instanceof Vehicle) {
                             player.sendMessage(ChatColor.DARK_PURPLE + "Vehicle tagged");
-                        } else if (entity instanceof Vehicle) {
+                        } else if (entity != null) {
                             player.sendMessage(ChatColor.DARK_PURPLE + "Entity tagged");
                         }
                     }
                 }
             }
         }
+    }
+
+    private void updateTime()
+    {
+        lastMoverAction = System.nanoTime();
+    }
+
+    private boolean timeElapsed()
+    {
+        long estimatedTime = System.nanoTime() - lastMoverAction;
+        return estimatedTime > plugin.sm.actionCooldown;
     }
 }

@@ -102,6 +102,10 @@ public class SettingsManager
     private Material[] throughFields = TransparentMaterials.array;
     private HashMap<String, Material> throughMap = TransparentMaterials.map;
 
+    // Cooldown between two actions in nanoseconds
+    public long actionCooldown;
+    public boolean actionMessage;
+
     private TelePlusPlus plugin;
     private File main;
     private FileConfiguration config;
@@ -234,6 +238,41 @@ public class SettingsManager
         if(moverItem == null) { Bukkit.getLogger().severe("[TelePlusPlus] Configuration of settings.mover-item is not valid, using default value (STICK)"); }
         moverItem = moverItem != null ? moverItem : Material.STICK;
         toolItem = toolItem != null ? toolItem : Material.BONE;
+
+        /* Cooldown handling */
+        actionMessage = config.getBoolean("settings.action-cooldown-message", true);
+        String cooldownType = config.getString("settings.action-cooldown-time-unit", "ms");
+        long timeMultiple;
+        switch(cooldownType)
+        {
+            case "ns":
+            case "nanosecond":
+                timeMultiple = 1;
+                break;
+            case "ms":
+            case "milisecond":
+                timeMultiple = 1000000;
+                break;
+            case "s":
+            case "sec":
+            case "second":
+               timeMultiple = 1000000000;
+               break;
+               default:
+                   timeMultiple = 1000000;
+                   break;
+        }
+
+        try
+        {
+            actionCooldown = config.getInt("settings.action-cooldown", 500);
+            actionCooldown = timeMultiple;
+        }
+        catch (Exception e)
+        {
+            // Default value
+            actionCooldown = 500 * 1000000;
+        }
 
         pageSize = config.getInt("settings.page-size", 10);
         clientSideGlass = config.getBoolean("settings.client-side-glass", true);

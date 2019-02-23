@@ -4,7 +4,7 @@
 
     <groupId>cz.sognus.TelePlusPlus</groupId>
     <artifactId>TelePlusPlus</artifactId>
-    <version>3.0.1-R1-UNSAFE</version>
+    <version>3.0.2-R1-UNSAFE</version>
     <name>TelePlusPlus</name>
     <url>https://forum.majncraft.cz/members/sognus.2887/</url>
 
@@ -55,6 +55,7 @@
             <version>1.13-R0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+
     </dependencies>
 
 

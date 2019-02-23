@@ -103,3 +103,6 @@ settings:
     page-size: 10
     client-side-glass: true
     explosion-effect: true
+    action-cooldown: 500
+    action-cooldown-time-unit: ms
+    settings.action-cooldown-message: true

@@ -79,7 +79,7 @@ public class TPPlayerListener implements Listener {
             if (item != null) {
                 if (item.getType().equals(plugin.sm.moverItem) && plugin.pm.hasPermission(player, plugin.pm.mover) && !plugin.sm.disableMover) {
                     double viewHeight = getPlayerViewHeight(event.getPlayer());
-                    TargetBlock aiming = new TargetBlock(player, 1000, 0.2, viewHeight, plugin.sm.getThroughMap());
+                    TargetBlock aiming = new TargetBlock(player,  plugin.sm.maxDistance, plugin.sm.checkDistance, viewHeight, plugin.sm.getThroughMap());
                     Block block = aiming.getTargetBlock();
 
                     if (block == null || block.getY() <= 1) {
@@ -108,7 +108,7 @@ public class TPPlayerListener implements Listener {
 
                 if (item.getType().equals(plugin.sm.toolItem) && plugin.pm.hasPermission(player, plugin.pm.tool) && !plugin.sm.disableTool) {
                     double viewHeight = getPlayerViewHeight(event.getPlayer());
-                    TargetBlock aiming = new TargetBlock(player, 1000, 0.2, viewHeight, plugin.sm.getThroughMap());
+                    TargetBlock aiming = new TargetBlock(player,  plugin.sm.maxDistance, plugin.sm.checkDistance, viewHeight, plugin.sm.getThroughMap());
                     Block block = aiming.getTargetBlock();
 
                     if (block == null || block.getY() <= 1) {
@@ -158,7 +158,7 @@ public class TPPlayerListener implements Listener {
             if (item != null) {
                 if (item.getType().equals(plugin.sm.toolItem) && plugin.pm.hasPermission(player, plugin.pm.tool) && !plugin.sm.disableTool) {
                     double viewHeight = getPlayerViewHeight(event.getPlayer());
-                    TargetBlock aiming = new TargetBlock(player, 1000, 0.2, viewHeight, plugin.sm.getThroughMap());
+                    TargetBlock aiming = new TargetBlock(player, plugin.sm.maxDistance, plugin.sm.checkDistance, viewHeight, plugin.sm.getThroughMap());
                     Block block = aiming.getTargetBlock();
 
                     if (block == null || block.getY() <= 1) {
@@ -224,7 +224,7 @@ public class TPPlayerListener implements Listener {
 
                     if (entity != null) {
                         double viewHeight = getPlayerViewHeight(event.getPlayer());
-                        TargetBlock aiming = new TargetBlock(player, 1000, 0.2, viewHeight, plugin.sm.getThroughMap());
+                        TargetBlock aiming = new TargetBlock(player,  plugin.sm.maxDistance, plugin.sm.checkDistance, viewHeight, plugin.sm.getThroughMap());
                         Block block = aiming.getTargetBlock();
 
                         if (block == null) {
@@ -260,7 +260,7 @@ public class TPPlayerListener implements Listener {
                         BlockData data = block.getBlockData();
 
                         double viewHeight = getPlayerViewHeight(event.getPlayer());
-                        TargetBlock aiming = new TargetBlock(player, 1000, 0.2, viewHeight, plugin.sm.getThroughMap());
+                        TargetBlock aiming = new TargetBlock(player,  plugin.sm.maxDistance, plugin.sm.checkDistance, viewHeight, plugin.sm.getThroughMap());
                         Block target = aiming.getFaceBlock();
 
                         if (target != null) {

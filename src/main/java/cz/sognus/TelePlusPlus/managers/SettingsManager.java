@@ -106,6 +106,10 @@ public class SettingsManager
     public long actionCooldown;
     public boolean actionMessage;
 
+    // Internal
+    public double checkDistance = 0.1;
+    public int maxDistance = 1000;
+
     private TelePlusPlus plugin;
     private File main;
     private FileConfiguration config;
@@ -274,6 +278,11 @@ public class SettingsManager
             actionCooldown = 500 * 1000000;
         }
 
+        // Internal config
+        checkDistance = config.getDouble("settings.internal-check-distance", 0.1 );
+        maxDistance = config.getInt("settings.internal-maximum-distance", 1000);
+
+        // Others
         pageSize = config.getInt("settings.page-size", 10);
         clientSideGlass = config.getBoolean("settings.client-side-glass", true);
         explosionEffect = config.getBoolean("settings.explosion-effect", true);

@@ -105,4 +105,6 @@ settings:
     explosion-effect: true
     action-cooldown: 500
     action-cooldown-time-unit: ms
-    settings.action-cooldown-message: true
+    action-cooldown-message: true
+    internal-check-distance: 0.1
+    internal-maximum-distance: 1000

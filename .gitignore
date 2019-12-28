@@ -45,7 +45,10 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-
+# =========================
+# Project testing
+# =========================
+/src/test/
 
 # =========================
 # IDE Project Files
@@ -54,6 +57,7 @@ Temporary Items
 *.project
 *.prefs
 /target/
+/out/
 /bin/
 *.iml
 /.idea/

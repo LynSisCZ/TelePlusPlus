@@ -1,7 +1,8 @@
-package net.sacredlabyrinth.Phaed.TelePlusPlus.managers;
+package cz.sognus.TelePlusPlus.managers;
 
-import net.sacredlabyrinth.Phaed.TelePlusPlus.TeleHistory;
-import net.sacredlabyrinth.Phaed.TelePlusPlus.TelePlusPlus;
+import cz.sognus.TelePlusPlus.TeleHistory;
+import cz.sognus.TelePlusPlus.TelePlusPlus;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -127,8 +128,11 @@ public class TeleportManager
 
     public boolean blockIsSafe(World world, double x, double y, double z)
     {
-        int id1 = world.getBlockTypeIdAt((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
-        int id2 = world.getBlockTypeIdAt((int) Math.floor(x), (int) Math.floor(y + 1), (int) Math.floor(z));
+        Location coord1 = new Location(world, Math.floor(x), Math.floor(y), Math.floor(z));
+        Location coord2 = new Location(world, Math.floor(x), Math.floor(y+1), Math.floor(z));
+
+        Block id1 = world.getBlockAt(coord1);
+        Block id2 = world.getBlockAt(coord2);
 
         return (plugin.sm.isSeeThrough(id1)) && (plugin.sm.isSeeThrough(id2));
     }

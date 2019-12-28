@@ -1,7 +1,8 @@
 name: TelePlusPlus
-version: 2.0.4
+version: 3.0.2
 dev-url: http://dev.bukkit.org/server-mods/teleplusplus/
-main: net.sacredlabyrinth.Phaed.TelePlusPlus.TelePlusPlus
+main: cz.sognus.TelePlusPlus.TelePlusPlus
+api-version: 1.13
 softdepend: [PreciousStones, VanishNoPacket]
 commands:
   tp:

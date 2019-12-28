@@ -1,8 +1,9 @@
-package net.sacredlabyrinth.Phaed.TelePlusPlus.managers;
+package cz.sognus.TelePlusPlus.managers;
 
-import net.sacredlabyrinth.Phaed.TelePlusPlus.TelePlusPlus;
+import cz.sognus.TelePlusPlus.TelePlusPlus;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -39,6 +40,8 @@ public class GlassedManager
         return false;
     }
 
+    /* Spigot/Bukkit sucks deprecated things were not reimplemented  */
+    @SuppressWarnings("deprecation")
     public boolean addGlassed(Player player, Block block)
     {
         plugin.gm.removeGlassedNotImmunity(player);
@@ -89,6 +92,8 @@ public class GlassedManager
         }
     }
 
+    /* Spigot sucks - deprecated items were not reimplemented */
+    @SuppressWarnings("deprecation")
     public void removeGlassedNotImmunity(Player player)
     {
         if (glassed.containsKey(player.getName()))
@@ -118,13 +123,25 @@ public class GlassedManager
     public int startImmuneRemovalDelay(Player player)
     {
         final String name = player.getName();
+        // Assume error
+        int err = 1;
 
-        return plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable()
+        try
         {
-            public void run()
+            plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, new Runnable()
             {
-                fallDamageImmune.remove(name);
-            }
-        }, plugin.sm.fallImmunitySeconds * 20L);
+                public void run()
+                {
+                    fallDamageImmune.remove(name);
+                }
+            }, plugin.sm.fallImmunitySeconds * 20L);
+            err = 0;
+
+        }catch (Exception e)
+        {
+            return err;
+        }
+
+        return err;
     }
 }

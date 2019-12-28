@@ -1,4 +1,4 @@
-package net.sacredlabyrinth.Phaed.TelePlusPlus.managers;
+package cz.sognus.TelePlusPlus.managers;
 
 import org.bukkit.Location;
 import org.bukkit.World;

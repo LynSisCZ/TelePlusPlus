@@ -1,6 +1,6 @@
-package net.sacredlabyrinth.Phaed.TelePlusPlus.managers;
+package cz.sognus.TelePlusPlus.managers;
 
-import net.sacredlabyrinth.Phaed.TelePlusPlus.TelePlusPlus;
+import cz.sognus.TelePlusPlus.TelePlusPlus;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;

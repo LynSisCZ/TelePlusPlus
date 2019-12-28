@@ -1,4 +1,4 @@
-package net.sacredlabyrinth.Phaed.TelePlusPlus;
+package cz.sognus.TelePlusPlus;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -7,17 +7,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * @author toi Thanks to Raphfrk for optimization of this class.
  */
-public class TargetBlock
-{
+public class TargetBlock {
     private Location loc;
     private double viewHeight;
     private int maxDistance;
-    private int[] blockToIgnore;
+    private HashMap<String, Material> blockToIgnoreMap;
     private double checkDistance, curDistance;
     private double xRotation, yRotation;
     private Vector targetPos = new Vector();
@@ -26,144 +26,156 @@ public class TargetBlock
     private Vector offset = new Vector();
 
     /**
-     * Constructor requiring a player, uses default values
-     *
-     * @param player Player to work with
+     * @deprecated since 3.0.1 due to performance issues with array lookup
      */
-    public TargetBlock(Player player)
-    {
-        this.setValues(player.getLocation(), 300, 1.65, 0.2, null);
+    @Deprecated
+    private Material[] blockToIgnore;
+
+    /**
+     * @param player           What player to work with
+     * @param maxDistance      How far it checks for blocks
+     * @param checkDistance    How often to check for blocks, the smaller the more precise
+     * @param blockToIgnoreMap Map of what block to ignore while checking for viable targets
+     * @author Sognus
+     * @since 3.0.1
+     */
+    public TargetBlock(Player player, int maxDistance, double checkDistance, HashMap<String, Material> blockToIgnoreMap) {
+        this.setValues(player.getLocation(), maxDistance, 1.65, checkDistance, blockToIgnoreMap);
     }
 
     /**
-     * Constructor requiring a location, uses default values
-     *
-     * @param loc Location to work with
+     * @param player           What player to work with
+     * @param maxDistance      How far it checks for blocks
+     * @param checkDistance    How often to check for blocks, the smaller the more precise
+     * @param blockToIgnoreMap Map of what block to ignore while checking for viable targets
+     * @author Sognus
+     * @since 3.0.1
      */
-    public TargetBlock(Location loc)
-    {
-        this.setValues(loc, 300, 0, 0.2, null);
+    public TargetBlock(Player player, int maxDistance, double checkDistance, double viewHeight, HashMap<String, Material> blockToIgnoreMap) {
+        this.setValues(player.getLocation(), maxDistance, viewHeight, checkDistance, blockToIgnoreMap);
     }
 
-    /**
-     * Constructor requiring a player, max distance and a checking distance
-     *
-     * @param player        Player to work with
-     * @param maxDistance   How far it checks for blocks
-     * @param checkDistance How often to check for blocks, the smaller the more precise
-     */
-    public TargetBlock(Player player, int maxDistance, double checkDistance)
-    {
-        this.setValues(player.getLocation(), maxDistance, 1.65, checkDistance, null);
-    }
 
     /**
-     * Constructor requiring a location, max distance and a checking distance
-     *
-     * @param loc           What location to work with
-     * @param maxDistance   How far it checks for blocks
-     * @param checkDistance How often to check for blocks, the smaller the more precise
-     */
-    public TargetBlock(Location loc, int maxDistance, double checkDistance)
-    {
-        this.setValues(loc, maxDistance, 0, checkDistance, null);
-    }
-
-    /**
-     * Constructor requiring a player, max distance, checking distance and an array of blocks to ignore
-     *
      * @param player         What player to work with
      * @param maxDistance    How far it checks for blocks
      * @param checkDistance  How often to check for blocks, the smaller the more precise
-     * @param blocksToIgnore Integer array of what block ids to ignore while checking for viable targets
+     * @param blocksToIgnore String ArrayList of what block ids to ignore while checking for viable targets
+     * @author Sognus
+     * @since 3.0.0
+     * @deprecated since 3.0.1 due to performance issues with array lookup
+     * <p>
+     * <p>
+     * Constructor requiring a player, max distance, checking distance and an array of blocks to ignore
      */
-    public TargetBlock(Player player, int maxDistance, double checkDistance, int[] blocksToIgnore)
-    {
+    @Deprecated
+    public TargetBlock(Player player, int maxDistance, double checkDistance, ArrayList<String> blocksToIgnore) {
+        Material[] bti = this.convertStringArraytoMaterialArray(blocksToIgnore);
+        this.setValues(player.getLocation(), maxDistance, 1.65, checkDistance, bti);
+    }
+
+    /**
+     * @param player Player to work with
+     * @deprecated since 3.0.1 due to performance issues with array lookup
+     * <p>
+     * Constructor requiring a player, uses default values
+     */
+    @Deprecated
+    public TargetBlock(Player player) {
+        this.setValues(player.getLocation(), 300, 1.65, 0.2, (Material[]) null);
+    }
+
+    /**
+     * @param loc Location to work with
+     * @deprecated since 3.0.1 due to performance issues with array lookup
+     * <p>
+     * Constructor requiring a location, uses default values
+     */
+    @Deprecated
+    public TargetBlock(Location loc) {
+        this.setValues(loc, 300, 0, 0.2, (Material[]) null);
+    }
+
+    /**
+     * @param player        Player to work with
+     * @param maxDistance   How far it checks for blocks
+     * @param checkDistance How often to check for blocks, the smaller the more precise
+     * @deprecated since 3.0.1 due to performance issues with array lookup
+     * <p>
+     * Constructor requiring a player, max distance and a checking distance
+     */
+    @Deprecated
+    public TargetBlock(Player player, int maxDistance, double checkDistance) {
+        this.setValues(player.getLocation(), maxDistance, 1.65, checkDistance, (Material[]) null);
+    }
+
+    /**
+     * @param loc           What location to work with
+     * @param maxDistance   How far it checks for blocks
+     * @param checkDistance How often to check for blocks, the smaller the more precise
+     * @deprecated since 3.0.1 due to performance issues with array lookup
+     * <p>
+     * Constructor requiring a location, max distance and a checking distance
+     */
+    @Deprecated
+    public TargetBlock(Location loc, int maxDistance, double checkDistance) {
+        this.setValues(loc, maxDistance, 0, checkDistance, (Material[]) null);
+    }
+
+    /**
+     * @param player         What player to work with
+     * @param maxDistance    How far it checks for blocks
+     * @param checkDistance  How often to check for blocks, the smaller the more precise
+     * @param blocksToIgnore Material array of what block ids to ignore while checking for viable targets
+     * @deprecated since 3.0.1 due to performance issues with array lookup
+     * <p>
+     * Constructor requiring a player, max distance, checking distance and an array of blocks to ignore
+     */
+    @Deprecated
+    public TargetBlock(Player player, int maxDistance, double checkDistance, Material[] blocksToIgnore) {
         this.setValues(player.getLocation(), maxDistance, 1.65, checkDistance, blocksToIgnore);
     }
 
     /**
-     * Constructor requiring a location, max distance, checking distance and an array of blocks to ignore
-     *
+     * @param player         What player to work with
+     * @param maxDistance    How far it checks for blocks
+     * @param checkDistance  How often to check for blocks, the smaller the more precise
+     * @param blocksToIgnore List of Material of what block ids to ignore while checking for viable targets
+     * @deprecated since 3.0.1 due to performance issues with array lookup
+     */
+    @Deprecated
+    public TargetBlock(Player player, int maxDistance, double checkDistance, List<Material> blocksToIgnore) {
+        Material[] arr = blocksToIgnore.toArray(new Material[blocksToIgnore.size()]);
+        this.setValues(player.getLocation(), maxDistance, 1.65, checkDistance, arr);
+    }
+
+    /**
      * @param loc            What location to work with
      * @param maxDistance    How far it checks for blocks
      * @param checkDistance  How often to check for blocks, the smaller the more precise
      * @param blocksToIgnore Array of what block ids to ignore while checking for viable targets
+     * @deprecated since 3.0.1 due to performance issues with array lookup
+     * <p>
+     * Constructor requiring a location, max distance, checking distance and an array of blocks to ignore
      */
-    public TargetBlock(Location loc, int maxDistance, double checkDistance, int[] blocksToIgnore)
-    {
+    @Deprecated
+    public TargetBlock(Location loc, int maxDistance, double checkDistance, Material[] blocksToIgnore) {
         this.setValues(loc, maxDistance, 0, checkDistance, blocksToIgnore);
     }
 
-    /**
-     * Constructor requiring a player, max distance, checking distance and an array of blocks to ignore
-     *
-     * @param player         What player to work with
-     * @param maxDistance    How far it checks for blocks
-     * @param checkDistance  How often to check for blocks, the smaller the more precise
-     * @param blocksToIgnore String ArrayList of what block ids to ignore while checking for viable targets
-     */
-    public TargetBlock(Player player, int maxDistance, double checkDistance, ArrayList<String> blocksToIgnore)
-    {
-        int[] bti = this.convertStringArraytoIntArray(blocksToIgnore);
-        this.setValues(player.getLocation(), maxDistance, 1.65, checkDistance, bti);
-    }
-
 
     /**
-     * Constructor requiring a player, max distance, checking distance and an array of blocks to ignore
-     *
-     * @param player         What player to work with
-     * @param maxDistance    How far it checks for blocks
-     * @param checkDistance  How often to check for blocks, the smaller the more precise
-     * @param blocksToIgnore Integer List of what block ids to ignore while checking for viable targets
-     */
-    public TargetBlock(Player player, int maxDistance, double checkDistance, List<Integer> blocksToIgnore)
-    {
-        int[] bti = this.convertIntListtoIntArray(blocksToIgnore);
-        this.setValues(player.getLocation(), maxDistance, 1.65, checkDistance, bti);
-    }
-
-    /**
-     * Constructor requiring a location, max distance, checking distance and an array of blocks to ignore
-     *
-     * @param loc            What location to work with
-     * @param maxDistance    How far it checks for blocks
-     * @param checkDistance  How often to check for blocks, the smaller the more precise
-     * @param blocksToIgnore String ArrayList of what block ids to ignore while checking for viable targets
-     */
-    public TargetBlock(Location loc, int maxDistance, double checkDistance, ArrayList<String> blocksToIgnore)
-    {
-        int[] bti = this.convertStringArraytoIntArray(blocksToIgnore);
-        this.setValues(loc, maxDistance, 0, checkDistance, bti);
-    }
-
-
-    /**
-     * Constructor requiring a location, max distance, checking distance and an array of blocks to ignore
-     *
-     * @param loc            What location to work with
-     * @param maxDistance    How far it checks for blocks
-     * @param checkDistance  How often to check for blocks, the smaller the more precise
-     * @param blocksToIgnore Integer List of what block ids to ignore while checking for viable targets
-     */
-    public TargetBlock(Location loc, int maxDistance, double checkDistance, List<Integer> blocksToIgnore)
-    {
-        int[] bti = this.convertIntListtoIntArray(blocksToIgnore);
-        this.setValues(loc, maxDistance, 0, checkDistance, bti);
-    }
-
-    /**
-     * Set the values, all constructors uses this function
-     *
      * @param loc            Location of the view
      * @param maxDistance    How far it checks for blocks
      * @param viewHeight     Where the view is positioned in y-axis
      * @param checkDistance  How often to check for blocks, the smaller the more precise
      * @param blocksToIgnore Ids of blocks to ignore while checking for viable targets
+     * @deprecated since 3.0.1 due to performance issues with array lookup
+     * <p>
+     * Set the values, all constructors uses this function
      */
-    private void setValues(Location loc, int maxDistance, double viewHeight, double checkDistance, int[] blocksToIgnore)
-    {
+    @Deprecated
+    private void setValues(Location loc, int maxDistance, double viewHeight, double checkDistance, Material[] blocksToIgnore) {
         this.loc = loc;
         this.maxDistance = maxDistance;
         this.viewHeight = viewHeight;
@@ -184,10 +196,40 @@ public class TargetBlock
     }
 
     /**
+     * @param loc               Location of the view
+     * @param maxDistance       How far it checks for blocks
+     * @param viewHeight        Where the view is positioned in y-axis
+     * @param checkDistance     How often to check for blocks, the smaller the more precise
+     * @param blocksToIgnoreMap Ids of blocks to ignore while checking for viable targets
+     * @author Sognus
+     * @since 3.0.1
+     * <p>
+     * Set the values, all constructors uses this function
+     */
+    private void setValues(Location loc, int maxDistance, double viewHeight, double checkDistance, HashMap<String, Material> blocksToIgnoreMap) {
+        this.loc = loc;
+        this.maxDistance = maxDistance;
+        this.viewHeight = viewHeight;
+        this.checkDistance = checkDistance;
+        this.blockToIgnoreMap = blocksToIgnoreMap;
+        this.curDistance = 0;
+        xRotation = (loc.getYaw() + 90) % 360;
+        yRotation = loc.getPitch() * -1;
+
+        double h = (checkDistance * Math.cos(Math.toRadians(yRotation)));
+        offset.setY((checkDistance * Math.sin(Math.toRadians(yRotation))));
+        offset.setX((h * Math.cos(Math.toRadians(xRotation))));
+        offset.setZ((h * Math.sin(Math.toRadians(xRotation))));
+
+        targetPosDouble = new Vector(loc.getX(), loc.getY() + viewHeight, loc.getZ());
+        targetPos = new Vector(targetPosDouble.getBlockX(), targetPosDouble.getBlockY(), targetPosDouble.getBlockZ());
+        prevPos = targetPos.clone();
+    }
+
+    /**
      * Call this to reset checking position to allow you to check for a new target with the same TargetBlock instance.
      */
-    public void reset()
-    {
+    public void reset() {
         targetPosDouble = new Vector(loc.getX(), loc.getY() + viewHeight, loc.getZ());
         targetPos = new Vector(targetPosDouble.getBlockX(), targetPosDouble.getBlockY(), targetPosDouble.getBlockZ());
         prevPos = targetPos.clone();
@@ -199,8 +241,7 @@ public class TargetBlock
      *
      * @return double
      */
-    public double getDistanceToBlock()
-    {
+    public double getDistanceToBlock() {
         Vector blockUnderPlayer = new Vector((int) Math.floor(loc.getX() + 0.5), (int) Math.floor(loc.getY() - 0.5), (int) Math.floor(loc.getZ() + 0.5));
 
         Block blk = getTargetBlock();
@@ -216,8 +257,7 @@ public class TargetBlock
      *
      * @return int
      */
-    public int getDistanceToBlockRounded()
-    {
+    public int getDistanceToBlockRounded() {
         Vector blockUnderPlayer = new Vector((int) Math.floor(loc.getX() + 0.5), (int) Math.floor(loc.getY() - 0.5), (int) Math.floor(loc.getZ() + 0.5));
 
         Block blk = getTargetBlock();
@@ -233,8 +273,7 @@ public class TargetBlock
      *
      * @return int
      */
-    public int getXDistanceToBlock()
-    {
+    public int getXDistanceToBlock() {
         this.reset();
         return (int) Math.floor(getTargetBlock().getX() - loc.getBlockX() + 0.5);
     }
@@ -244,8 +283,7 @@ public class TargetBlock
      *
      * @return int
      */
-    public int getYDistanceToBlock()
-    {
+    public int getYDistanceToBlock() {
         this.reset();
         return (int) Math.floor(getTargetBlock().getY() - loc.getBlockY() + viewHeight);
     }
@@ -255,8 +293,7 @@ public class TargetBlock
      *
      * @return int
      */
-    public int getZDistanceToBlock()
-    {
+    public int getZDistanceToBlock() {
         this.reset();
         return (int) Math.floor(getTargetBlock().getZ() - loc.getBlockZ() + 0.5);
     }
@@ -266,39 +303,11 @@ public class TargetBlock
      *
      * @return Block
      */
-    public Block getTargetBlock()
-    {
+    public Block getTargetBlock() {
         this.reset();
-        while ((getNextBlock() != null) && ((getCurrentBlock().getTypeId() == 0) || this.blockToIgnoreHasValue(getCurrentBlock().getTypeId())))
-        {
-            ;
+        while ((getNextBlock() != null) && ((getCurrentBlock().getType() == Material.AIR) || this.isBlockToIgnore(getCurrentBlock().getType()))) {
         }
         return getCurrentBlock();
-    }
-
-    /**
-     * Sets the type of the block at the sight. Returns false if the block wasn't set.
-     *
-     * @param typeID ID of type to set the block to
-     * @return boolean
-     */
-    public boolean setTargetBlock(int typeID)
-    {
-        if (Material.getMaterial(typeID) != null)
-        {
-            this.reset();
-            while (getNextBlock() != null && getCurrentBlock().getTypeId() == 0)
-            {
-                ;
-            }
-            if (getCurrentBlock() != null)
-            {
-                Block blk = loc.getWorld().getBlockAt(targetPos.getBlockX(), targetPos.getBlockY(), targetPos.getBlockZ());
-                blk.setTypeId(typeID);
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -307,15 +316,11 @@ public class TargetBlock
      * @param type Material to set the block to
      * @return boolean
      */
-    public boolean setTargetBlock(Material type)
-    {
+    public boolean setTargetBlock(Material type) {
         this.reset();
-        while ((getNextBlock() != null) && ((getCurrentBlock().getTypeId() == 0) || this.blockToIgnoreHasValue(getCurrentBlock().getTypeId())))
-        {
-            ;
+        while ((getNextBlock() != null) && ((getCurrentBlock().getType() == Material.AIR) || this.isBlockToIgnore(getCurrentBlock().getType()))) {
         }
-        if (getCurrentBlock() != null)
-        {
+        if (getCurrentBlock() != null) {
             Block blk = loc.getWorld().getBlockAt(targetPos.getBlockX(), targetPos.getBlockY(), targetPos.getBlockZ());
             blk.setType(type);
             return true;
@@ -329,61 +334,15 @@ public class TargetBlock
      * @param type Name of type to set the block to
      * @return boolean
      */
-    public boolean setTargetBlock(String type)
-    {
+    public boolean setTargetBlock(String type) {
         Material mat = Material.valueOf(type);
-        if (mat != null)
-        {
+        if (mat != null) {
             this.reset();
-            while ((getNextBlock() != null) && ((getCurrentBlock().getTypeId() == 0) || this.blockToIgnoreHasValue(getCurrentBlock().getTypeId())))
-            {
-                ;
+            while ((getNextBlock() != null) && ((getCurrentBlock().getType() == Material.AIR) || this.isBlockToIgnore(getCurrentBlock().getType()))) {
             }
-            if (getCurrentBlock() != null)
-            {
+            if (getCurrentBlock() != null) {
                 Block blk = loc.getWorld().getBlockAt(targetPos.getBlockX(), targetPos.getBlockY(), targetPos.getBlockZ());
                 blk.setType(mat);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns the block attached to the face at the sight. Returns null if out of range or if no viable target was found
-     *
-     * @return Block
-     */
-    public Block getFaceBlock()
-    {
-        while ((getNextBlock() != null) && ((getCurrentBlock().getTypeId() == 0) || this.blockToIgnoreHasValue(getCurrentBlock().getTypeId())))
-        {
-            ;
-        }
-        if (getCurrentBlock() != null)
-        {
-            return getPreviousBlock();
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    /**
-     * Sets the type of the block attached to the face at the sight. Returns false if the block wasn't set.
-     *
-     * @param typeID
-     * @return boolean
-     */
-    public boolean setFaceBlock(int typeID)
-    {
-        if (Material.getMaterial(typeID) != null)
-        {
-            if (getCurrentBlock() != null)
-            {
-                Block blk = loc.getWorld().getBlockAt(prevPos.getBlockX(), prevPos.getBlockY(), prevPos.getBlockZ());
-                blk.setTypeId(typeID);
                 return true;
             }
         }
@@ -396,10 +355,8 @@ public class TargetBlock
      * @param type
      * @return boolean
      */
-    public boolean setFaceBlock(Material type)
-    {
-        if (getCurrentBlock() != null)
-        {
+    public boolean setFaceBlock(Material type) {
+        if (getCurrentBlock() != null) {
             Block blk = loc.getWorld().getBlockAt(prevPos.getBlockX(), prevPos.getBlockY(), prevPos.getBlockZ());
             blk.setType(type);
             return true;
@@ -413,13 +370,10 @@ public class TargetBlock
      * @param type
      * @return boolean
      */
-    public boolean setFaceBlock(String type)
-    {
+    public boolean setFaceBlock(String type) {
         Material mat = Material.valueOf(type);
-        if (mat != null)
-        {
-            if (getCurrentBlock() != null)
-            {
+        if (mat != null) {
+            if (getCurrentBlock() != null) {
                 Block blk = loc.getWorld().getBlockAt(prevPos.getBlockX(), prevPos.getBlockY(), prevPos.getBlockZ());
                 blk.setType(mat);
                 return true;
@@ -433,11 +387,9 @@ public class TargetBlock
      *
      * @return Block
      */
-    public Block getNextBlock()
-    {
+    public Block getNextBlock() {
         prevPos = targetPos.clone();
-        do
-        {
+        do {
             curDistance += checkDistance;
 
             targetPosDouble.setX(offset.getX() + targetPosDouble.getX());
@@ -445,8 +397,7 @@ public class TargetBlock
             targetPosDouble.setZ(offset.getZ() + targetPosDouble.getZ());
             targetPos = new Vector(targetPosDouble.getBlockX(), targetPosDouble.getBlockY(), targetPosDouble.getBlockZ());
         } while (curDistance <= maxDistance && targetPos.getBlockX() == prevPos.getBlockX() && targetPos.getBlockY() == prevPos.getBlockY() && targetPos.getBlockZ() == prevPos.getBlockZ());
-        if (curDistance > maxDistance)
-        {
+        if (curDistance > maxDistance) {
             return null;
         }
 
@@ -458,14 +409,10 @@ public class TargetBlock
      *
      * @return Block
      */
-    public Block getCurrentBlock()
-    {
-        if (curDistance > maxDistance)
-        {
+    public Block getCurrentBlock() {
+        if (curDistance > maxDistance) {
             return null;
-        }
-        else
-        {
+        } else {
             return this.loc.getWorld().getBlockAt(this.targetPos.getBlockX(), this.targetPos.getBlockY(), this.targetPos.getBlockZ());
         }
     }
@@ -473,32 +420,11 @@ public class TargetBlock
     /**
      * Sets current block type. Returns false if the block wasn't set.
      *
-     * @param typeID
-     */
-    public boolean setCurrentBlock(int typeID)
-    {
-        if (Material.getMaterial(typeID) != null)
-        {
-            Block blk = getCurrentBlock();
-            if (blk != null)
-            {
-                blk.setTypeId(typeID);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Sets current block type. Returns false if the block wasn't set.
-     *
      * @param type
      */
-    public boolean setCurrentBlock(Material type)
-    {
+    public boolean setCurrentBlock(Material type) {
         Block blk = getCurrentBlock();
-        if (blk != null)
-        {
+        if (blk != null) {
             blk.setType(type);
             return true;
         }
@@ -510,14 +436,11 @@ public class TargetBlock
      *
      * @param type
      */
-    public boolean setCurrentBlock(String type)
-    {
+    public boolean setCurrentBlock(String type) {
         Material mat = Material.valueOf(type);
-        if (mat != null)
-        {
+        if (mat != null) {
             Block blk = getCurrentBlock();
-            if (blk != null)
-            {
+            if (blk != null) {
                 blk.setType(mat);
                 return true;
             }
@@ -530,28 +453,8 @@ public class TargetBlock
      *
      * @return Block
      */
-    public Block getPreviousBlock()
-    {
+    public Block getPreviousBlock() {
         return this.loc.getWorld().getBlockAt(prevPos.getBlockX(), prevPos.getBlockY(), prevPos.getBlockZ());
-    }
-
-    /**
-     * Sets previous block type id. Returns false if the block wasn't set.
-     *
-     * @param typeID
-     */
-    public boolean setPreviousBlock(int typeID)
-    {
-        if (Material.getMaterial(typeID) != null)
-        {
-            Block blk = getPreviousBlock();
-            if (blk != null)
-            {
-                blk.setTypeId(typeID);
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -559,11 +462,9 @@ public class TargetBlock
      *
      * @param type
      */
-    public boolean setPreviousBlock(Material type)
-    {
+    public boolean setPreviousBlock(Material type) {
         Block blk = getPreviousBlock();
-        if (blk != null)
-        {
+        if (blk != null) {
             blk.setType(type);
             return true;
         }
@@ -575,14 +476,11 @@ public class TargetBlock
      *
      * @param type
      */
-    public boolean setPreviousBlock(String type)
-    {
+    public boolean setPreviousBlock(String type) {
         Material mat = Material.valueOf(type);
-        if (mat != null)
-        {
+        if (mat != null) {
             Block blk = getPreviousBlock();
-            if (blk != null)
-            {
+            if (blk != null) {
                 blk.setType(mat);
                 return true;
             }
@@ -590,40 +488,35 @@ public class TargetBlock
         return false;
     }
 
-    private int[] convertStringArraytoIntArray(ArrayList<String> array)
-    {
-        if (array != null)
-        {
-            int intarray[] = new int[array.size()];
-            for (int i = 0; i < array.size(); i++)
-            {
-                try
-                {
-                    intarray[i] = Integer.parseInt(array.get(i));
-                }
-                catch (NumberFormatException nfe)
-                {
-                    intarray[i] = 0;
+    /**
+     * @deprecated since 3.0.1
+     */
+    private Material[] convertStringArraytoMaterialArray(ArrayList<String> array) {
+        if (array != null) {
+            Material[] matarray = new Material[array.size()];
+            for (int i = 0; i < array.size(); i++) {
+                try {
+                    matarray[i] = Material.getMaterial(array.get(i));
+                } catch (NumberFormatException nfe) {
+                    matarray[i] = null;
                 }
             }
-            return intarray;
+            return matarray;
         }
         return null;
     }
 
-    private int[] convertIntListtoIntArray(List<Integer> array)
-    {
-        if (array != null)
-        {
-            int intarray[] = new int[array.size()];
-            for (int i = 0; i < array.size(); i++)
-            {
-                try
-                {
+    /**
+     * @deprecated since 3.0.1
+     */
+    @Deprecated
+    private int[] convertIntListtoIntArray(List<Integer> array) {
+        if (array != null) {
+            int[] intarray = new int[array.size()];
+            for (int i = 0; i < array.size(); i++) {
+                try {
                     intarray[i] = array.get(i);
-                }
-                catch (NumberFormatException nfe)
-                {
+                } catch (NumberFormatException nfe) {
                     intarray[i] = 0;
                 }
             }
@@ -633,21 +526,42 @@ public class TargetBlock
     }
 
 
-    private boolean blockToIgnoreHasValue(int value)
-    {
-        if (this.blockToIgnore != null)
-        {
-            if (this.blockToIgnore.length > 0)
-            {
-                for (int i : this.blockToIgnore)
-                {
-                    if (i == value)
-                    {
+    public Block getFaceBlock() {
+        while ((getNextBlock() != null) && ((getCurrentBlock().getType() == Material.AIR) || this.isBlockToIgnore(getCurrentBlock().getType()))) {
+        }
+        if (getCurrentBlock() != null) {
+            return getPreviousBlock();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param value Material lookup
+     * @return array contains value
+     * @deprecated since 3.0.1 due to performance issues
+     */
+    @Deprecated
+    private boolean blockToIgnoreHasValue(Material value) {
+        if (this.blockToIgnore != null) {
+            if (this.blockToIgnore.length > 0) {
+                for (Material i : this.blockToIgnore) {
+                    if (i == value) {
                         return true;
                     }
                 }
             }
         }
         return false;
+    }
+
+    /**
+     * @param lookup material to check
+     * @return whether map contains given material
+     * @author Sognus
+     * @since 3.0.1
+     */
+    private boolean isBlockToIgnore(Material lookup) {
+        return (this.blockToIgnoreMap.get(lookup.name()) != null);
     }
 }

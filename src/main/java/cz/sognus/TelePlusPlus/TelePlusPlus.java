@@ -1,18 +1,17 @@
-package net.sacredlabyrinth.Phaed.TelePlusPlus;
+package cz.sognus.TelePlusPlus;
 
-import net.sacredlabyrinth.Phaed.TelePlusPlus.listeners.TPEntityListener;
-import net.sacredlabyrinth.Phaed.TelePlusPlus.listeners.TPPlayerListener;
-import net.sacredlabyrinth.Phaed.TelePlusPlus.managers.*;
+import cz.sognus.TelePlusPlus.listeners.TPEntityListener;
+import cz.sognus.TelePlusPlus.listeners.TPPlayerListener;
+import cz.sognus.TelePlusPlus.managers.*;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.mcstats.Metrics;
 
-import java.io.IOException;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-public class TelePlusPlus extends JavaPlugin
-{
-    private TPPlayerListener playerListener;
-    private TPEntityListener entityListener;
+public class TelePlusPlus extends JavaPlugin {
+    public static TelePlusPlus plugin = null;
+    public static Logger log;
     public PermissionsManager pm;
     public SettingsManager sm;
     public RequestsManager rm;
@@ -22,11 +21,10 @@ public class TelePlusPlus extends JavaPlugin
     public CommandManager cm;
     public MoverManager mm;
     public ItemManager im;
+    private TPPlayerListener playerListener;
+    private TPEntityListener entityListener;
 
-    public static Logger log;
-
-    public void onEnable()
-    {
+    public void onEnable() {
         playerListener = new TPPlayerListener(this);
         entityListener = new TPEntityListener(this);
         pm = new PermissionsManager(this);
@@ -46,16 +44,6 @@ public class TelePlusPlus extends JavaPlugin
 
         getCommand("tp").setExecutor(cm);
 
-
-        metrics();
-    }
-
-    private void metrics()
-    {
-        try {
-            Metrics metrics = new Metrics(this);
-            metrics.start();
-        } catch (IOException e) {
-        }
+        plugin = this;
     }
 }

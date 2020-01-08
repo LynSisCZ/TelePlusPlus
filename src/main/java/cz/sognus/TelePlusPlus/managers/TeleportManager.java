@@ -86,16 +86,10 @@ public class TeleportManager
                 {
                     sneaking = true;
                 }
-            }
 
-            if (entity instanceof Player)
-            {
-                if (plugin.sm.explosionEffect)
+                if (plugin.sm.explosionEffect && !plugin.pm.isVanished((Player) entity) && !sneaking)
                 {
-                    if (!plugin.pm.isVanished((Player) entity) && !sneaking)
-                    {
-                        world.createExplosion(entity.getLocation(), -1);
-                    }
+                    entity.getWorld().createExplosion(entity.getLocation(), -1);
                 }
             }
 

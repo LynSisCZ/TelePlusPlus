@@ -558,7 +558,11 @@ public class TransparentMaterials {
             Material.LEGACY_RECORD_9,
             Material.LEGACY_RECORD_10,
             Material.LEGACY_RECORD_11,
-            Material.LEGACY_RECORD_12
+            Material.LEGACY_RECORD_12,
+            // 1.18
+            Material.CAVE_VINES_PLANT,
+            Material.CAVE_VINES
+
     };
 
     /* Static initializer block to fill HashMap with values  */

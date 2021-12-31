@@ -51,10 +51,9 @@ public class TeleportManager
 
         x = x + .5D;
         z = z + .5D;
-
-        if (y < 1)
+        if (y < world.getMinHeight())
         {
-            y = 1;
+            y = world.getMinHeight() + 1;
         }
 
         if (!world.isChunkLoaded(destination.getBlockX() >> 4, destination.getBlockZ() >> 4))
@@ -66,7 +65,7 @@ public class TeleportManager
         {
             y += 1;
 
-            if (y >= 255)
+            if (y >= world.getMaxHeight())
             {
                 return false;
             }

@@ -82,7 +82,7 @@ public class TPPlayerListener implements Listener {
                     TargetBlock aiming = new TargetBlock(player,  plugin.sm.maxDistance, plugin.sm.checkDistance, viewHeight, plugin.sm.getThroughMap());
                     Block block = aiming.getTargetBlock();
 
-                    if (block == null || block.getY() <= 1) {
+                    if (block == null || block.getY() <= block.getWorld().getMinHeight()) {
                         player.sendMessage(ChatColor.RED + "Not pointing to valid block");
                     } else {
                         event.setCancelled(true);
@@ -111,7 +111,7 @@ public class TPPlayerListener implements Listener {
                     TargetBlock aiming = new TargetBlock(player,  plugin.sm.maxDistance, plugin.sm.checkDistance, viewHeight, plugin.sm.getThroughMap());
                     Block block = aiming.getTargetBlock();
 
-                    if (block == null || block.getY() <= 1) {
+                    if (block == null || block.getY() <= block.getWorld().getMinHeight()) {
                         player.sendMessage(ChatColor.RED + "Not pointing to valid block");
                     } else {
                         Location loc = new Location(block.getWorld(), block.getX(), block.getY() + 1, block.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
@@ -161,14 +161,14 @@ public class TPPlayerListener implements Listener {
                     TargetBlock aiming = new TargetBlock(player, plugin.sm.maxDistance, plugin.sm.checkDistance, viewHeight, plugin.sm.getThroughMap());
                     Block block = aiming.getTargetBlock();
 
-                    if (block == null || block.getY() <= 1) {
+                    if (block == null || block.getY() <= block.getWorld().getMinHeight()) {
                         player.sendMessage(ChatColor.RED + "Not pointing to valid block");
                     } else {
                         boolean passed = false;
                         Location from = block.getLocation();
 
                         while ((block = aiming.getNextBlock()) != null) {
-                            if (block.getY() <= 1) {
+                            if (block.getY() <= block.getWorld().getMinHeight()) {
                                 player.sendMessage(ChatColor.RED + "No free space available for teleport");
                                 return;
                             }

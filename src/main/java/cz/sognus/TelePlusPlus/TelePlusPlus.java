@@ -39,8 +39,8 @@ public class TelePlusPlus extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(playerListener, this);
         getServer().getPluginManager().registerEvents(entityListener, this);
-
-        log = Logger.getLogger("Minecraft");
+        getLogger().info("TELE++++++ a has been loaded");
+        log = getLogger();
 
         getCommand("tp").setExecutor(cm);
 

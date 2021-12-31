@@ -39,7 +39,6 @@ public class TelePlusPlus extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(playerListener, this);
         getServer().getPluginManager().registerEvents(entityListener, this);
-        getLogger().info("TELE++++++ a has been loaded");
         log = getLogger();
 
         getCommand("tp").setExecutor(cm);
